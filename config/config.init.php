@@ -27,23 +27,24 @@ $g_config = array();
 
 
 
-$g_config['silex_autoload_location'] =  '/var/vendor/autoload.php';
+$g_config['silex_autoload_location'] =  __DIR__.'/../vendor/autoload.php';
 
 
 
 ////////// Logs & error configuration //////////////
 
-$g_config['log_level'] = 'notice';  // Note: info for dev, notice for production
-$g_config['app_log_path'] = '/var/baztille-data/log/';
+$g_config['log_level'] = 'info';  // Note: info for dev, notice for production
+$g_config['app_log_path'] = __DIR__.'/../../log/';
 $g_config['error_reporting_level'] = ( E_ALL | E_STRICT ) & ~E_DEPRECATED;
 error_reporting( $g_config['error_reporting_level'] );
 
 
 ////////// Application paths and URLs //////////////
 
-$g_config['app_domain'] = "baztille.org";
-$g_config['app_base_url'] = "http://TO_BE_CHANGED";
+$g_config['app_domain'] = "baztille.dev";
+$g_config['app_base_url'] = "http://localhost:8100/";
 $g_config['app_website_name'] = "Baztille";
+$g_config['app_webservice_url'] = "http://baztille.dev";
 
 $g_config['password_salt'] = 'TO_BE_CHANGED';
 
