@@ -13,31 +13,22 @@ Baztille est un mouvement de citoyens pour réinventer la démocratie.
 
 ## Installation
 
-(todo / dependencies Mongo/Composer/PHP)
-
+(todo / dependencies)
+PHP
+MongoDB
+Composer
+Log - Pear
+```
+$ apt-get install php-pear
+$ pear install Log
+```
 
 ```bash
 # Cloner le repo
 $ git clone git://github.com/Baztille/api.git
 $ composer install --prefer-source
-$ ionic state restore
-$ bower install
-# Se connecter aux services de ionic (Push & analytics)
-$ ionic io init
 
 # Configurer l'URL de l'API
-# config.js : this.apiUrl
-
-# Demarrer le serveur
-$ ionic serve
-
-# Ajouter une platforme
-$ ionic platform android
-$ ionic platform ios
-
-# Lancer l'application
-$ ionic run ios
-$ ionic run android
 
 ```
 
