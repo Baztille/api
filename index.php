@@ -1,4 +1,5 @@
 <?php
+
 /*********************************************************************************
 
     Baztille
@@ -27,18 +28,28 @@ $starttime = $starttime[1] + $starttime[0];
 
 use Igorw\Middleware\Stack;
 use Symfony\Component\HttpFoundation\Request;
+use Silex\Provider\SwiftmailerServiceProvider;
 
 // Default configuration
 require_once __DIR__.'/config/config.init.php';
 
 // Actual configuration
-require_once '/var/baztille-data/config/config.php';
+//require_once __DIR__.'/config/config.php';
 require_once __DIR__.'/config/version.php';
 
 // Require Silex
 $loader = require_once $g_config['silex_autoload_location'];
 
 $app = new Silex\Application();
+
+// Require Swiftmailer
+$app->register(new Silex\Provider\SwiftmailerServiceProvider());
+$app['mailer'] = new \Swift_MailTransport;
+
+// Require Twig
+$app->register(new Silex\Provider\TwigServiceProvider(), array(
+    'twig.path' => __DIR__.'/templates',
+));
 
 $app['debug'] = true;
 $loader->add('baztille', __DIR__ . '/services');
@@ -49,6 +60,7 @@ require_once __DIR__.'/services/_loadservices.php';
 
 $trace = $app['trace'];
 $is_job = isset( $_SERVER['argv'] );
+
 
 
 $trace->start_page(  $starttime, $is_job );
