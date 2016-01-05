@@ -26,6 +26,7 @@ $ pear install Log
 ```bash
 # Cloner le repo
 $ git clone git://github.com/Baztille/api.git
+$ cd api
 $ composer install --prefer-source
 
 # Configurer l'URL de l'API
