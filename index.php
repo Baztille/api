@@ -34,7 +34,7 @@ use Silex\Provider\SwiftmailerServiceProvider;
 require_once __DIR__.'/config/config.init.php';
 
 // Actual configuration
-//require_once __DIR__.'/config/config.php';
+require_once __DIR__.'/config/config.php';
 require_once __DIR__.'/config/version.php';
 
 // Require Silex
