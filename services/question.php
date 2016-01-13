@@ -25,6 +25,29 @@ use Silex\Application;
 
 namespace baztille;
 
+define( 'UX_QUESTION_SORTING_CHOOSE_BEST', 0 );
+define( 'UX_QUESTION_SORTING_HOTTEST', 1 );
+define( 'UX_QUESTION_SORTING_VOTED', 2 );
+define( 'UX_QUESTION_SORTING_RECENT', 3 );
+define( 'UX_QUESTION_SORTING_DATE_VOTED', 3 );
+define( 'UX_QUESTION_SORTING_DATE_DECIDED', 3 );
+
+define( 'UX_QUESTION_CATEGORY_ALL', 1 );
+define( 'UX_QUESTION_CATEGORY_CULTURE', 2 );
+define( 'UX_QUESTION_CATEGORY_ECONOMY', 3 );
+define( 'UX_QUESTION_CATEGORY_EDUCATION', 4 );
+define( 'UX_QUESTION_CATEGORY_ENVIRONMENT', 5 );
+define( 'UX_QUESTION_CATEGORY_STATE', 6 );
+define( 'UX_QUESTION_CATEGORY_INTERNATIONAL', 7 );
+define( 'UX_QUESTION_CATEGORY_JUSTICE', 8 );
+define( 'UX_QUESTION_CATEGORY_RESEARCH', 9 );
+define( 'UX_QUESTION_CATEGORY_HEALTH', 10 );
+define( 'UX_QUESTION_CATEGORY_SECURITY', 11 );
+define( 'UX_QUESTION_CATEGORY_SOCIETY', 12 );
+define( 'UX_QUESTION_CATEGORY_WORK', 13 );
+define( 'UX_QUESTION_CATEGORY_OTHER', 14 );
+
+
 class question
 {
 	
@@ -33,49 +56,148 @@ class question
     	$this->app = $app;
     }
     
-    public function listQuestions( $status, $page )
+    public function listQuestions( $status, $page, $category=UX_QUESTION_CATEGORY_ALL, $sorting=UX_QUESTION_SORTING_CHOOSE_BEST )
     {
         global $g_config;
 		$m = new \MongoClient(); // connect
 		$db = $m->selectDB("baztille");
 		
 		// List questions with this status
-		$cursor = $db->questions->find( array('status' => $status ) );
-		
-		if( $status == 'proposed' )
-			$cursor->sort( array( 'vote' => -1, 'date_proposed' => -1 ) );
-		else if( $status == 'vote' )    // Vote in progress
-			$cursor->sort( array( 'date_vote' => 1 ) );
-		else if( $status == 'decided' ) // Vote ended
-			$cursor->sort( array( 'date_decided' => -1 ) );
-		
-		$questions = array( 'list' => array() );
-		
+
+
+        if( $sorting == UX_QUESTION_SORTING_CHOOSE_BEST )
+        {
+		    if( $status == 'proposed' )
+			    $sorting = UX_QUESTION_SORTING_VOTED;
+		    else if( $status == 'vote' )    // Vote in progress
+			    $sorting = UX_QUESTION_SORTING_DATE_VOTED;
+		    else if( $status == 'decided' ) // Vote ended
+			    $sorting = UX_QUESTION_SORTING_DATE_DECIDED;
+        }
+        
+        if( $sorting == UX_QUESTION_SORTING_HOTTEST )
+        {
+            $two_hours_ahead = time() + ( 2*3600 );
+
+		    $questions_ordered = $db->questions->aggregate( 
+		        array( 
+		        
+		                array( '$match' => array( 'status' => $status ) ),
+		                array( '$project' => array( 
+                                              'score' => array( 
+                                                    '$divide' => array( 
+                                                         array(
+                                                            '$subtract' => array( '$vote', 0 )    // Divide number of votes minus one (don't take into account first voter)
+                                                         ),
+                                                         array( 
+                                                            '$subtract' => array( $two_hours_ahead, '$date_proposed' ) // By time since proposed, +2 hours
+                                                         ) )
+                                               )
+                                          )
+                        ),
+                        array( '$sort' => array( 'score' => -1 ) )
+                        
+                     )
+                );       
+
+
+            // Make sure the most voted question is always first, anytime
+            $cursor = $db->questions->find( array( 'status' => $status ), array( 'vote' => 1 ) )->sort( array( 'vote' => -1 ) );
+		    $question = $cursor->getNext();
+            $first_question_id = (string)$question['_id'];
+
+            $questions_ids = array( $first_question_id );
+
+		    foreach( $questions_ordered['result'] as $question_in_order )
+		    {		    
+		        $question_id = (string) $question_in_order['_id'];
+		        if( $question_id != $first_question_id )
+    		        $questions_ids[] = $question_id;
+            }
+
+        }
+        else if( $sorting == UX_QUESTION_SORTING_RECENT )
+        {
+            $cursor = $db->questions->find( array( 'status' => $status ), array( 'date_proposed' => 1 ) )->sort( array( 'date_proposed' => -1 ) );
+            $questions_ids = array();
+		    while( $question = $cursor->getNext() )
+		    {
+                $questions_ids[] = (string)$question['_id'];
+            }
+        }        
+        else if( $sorting == UX_QUESTION_SORTING_VOTED )
+        {
+            $cursor = $db->questions->find( array( 'status' => $status ), array( 'vote' => 1 ) )->sort( array( 'vote' => -1 ) );
+            $questions_ids = array();
+		    while( $question = $cursor->getNext() )
+		    {
+                $questions_ids[] = (string)$question['_id'];
+            }
+        }
+        else if( $sorting == UX_QUESTION_SORTING_DATE_VOTED )
+        {
+            $cursor = $db->questions->find( array( 'status' => $status ), array( 'date_vote' => 1 ) )->sort( array( 'date_vote' => 1 ) );
+            $questions_ids = array();
+		    while( $question = $cursor->getNext() )
+		    {
+                $questions_ids[] = (string)$question['_id'];
+            }
+        }
+        else if( $sorting == UX_QUESTION_SORTING_DATE_DECIDED )
+        {
+            $cursor = $db->questions->find( array( 'status' => $status ), array( 'date_decided' => 1 ) )->sort( array( 'date_decided' => 1 ) );
+            $questions_ids = array();
+		    while( $question = $cursor->getNext() )
+		    {
+                $questions_ids[] = (string)$question['_id'];
+            }
+        }
+        else
+        {
+		    throw new \Exception( "Unknow sorrting method" );        
+        }
+        
+        // Get all questions
+        $cursor = $db->questions->find( array( 'status' => $status ) );
+        $questions_data = array();
 		while( $question = $cursor->getNext() )
 		{
-			if( $status == 'vote' || $status == 'proposed' )
-			{
-				// Retrieve current best answer
-				$argcursor = $db->args->find( array( 'question' => (string)$question['_id'], 'parent' => 0 ) );
-				$argcursor->sort( array( 'vote' => -1 ) );
-				$question['bestAnswer'] = array( $argcursor->getNext() );
-				$question['nbReponse'] = $argcursor->count();
-			}
+		    $questions_data[ (string)$question['_id'] ] = $question;
+        }
+        
+		// Build answer
+		$questions = array( 'list' => array() );
+		
+		foreach( $questions_ids as $question_id )
+		{
+		    if( isset( $questions_data[ $question_id ] ) )
+		    {		    
+		        $question = $questions_data[ $question_id ];
+		        
+			    if( $status == 'vote' || $status == 'proposed' )
+			    {
+				    // Retrieve current best answer
+				    $argcursor = $db->args->find( array( 'question' => (string)$question['_id'], 'parent' => 0 ) );
+				    $argcursor->sort( array( 'vote' => -1 ) );
+				    $question['bestAnswer'] = array( $argcursor->getNext() );
+				    $question['nbReponse'] = $argcursor->count();
+			    }
 			
-			if( $status == 'proposed' )
-			{
-			    if( ! isset( $question['failedSelection'] ) )
-			        $question['failedSelection'] = 0;
+			    if( $status == 'proposed' )
+			    {
+			        if( ! isset( $question['failedSelection'] ) )
+			            $question['failedSelection'] = 0;
 
-			    $question['remaining_attempts'] = ( $g_config['proposed_questions_selection_max_attempts'] - $question['failedSelection'] );
-			}
-			if( $status == 'vote' )
-			{
-			    $question['date_vote_end'] = $question['date_vote'] + $g_config['current_question_vote_delay']*24*3600;
-			}
+			        $question['remaining_attempts'] = ( $g_config['proposed_questions_selection_max_attempts'] - $question['failedSelection'] );
+			    }
+			    if( $status == 'vote' )
+			    {
+			        $question['date_vote_end'] = $question['date_vote'] + $g_config['current_question_vote_delay']*24*3600;
+			    }
 
 
-		    $questions['list'][] = $question;
+		        $questions['list'][] = $question;
+            }
 		}    
 
 		$user = $this->app['current_user'];

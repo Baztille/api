@@ -35,6 +35,12 @@ $c_question->get( '/list/{status}/{page}', function( $status, $page ) use ($app)
 } );
 
 
+$c_question->get( '/list/{status}/{page}/{category}/{sorting}', function( $status, $page, $category, $sorting ) use ($app) {
+
+	$questions = $app['question']->listQuestions( $status, $page, $category, $sorting );
+    return $app->json( $app['wsrequest']->buildWsResponse( $questions ), 201, array('Access-Control-Allow-Origin' => '*', 'Access-Control-Allow-Headers'=>'Content-Type','Content-Type' => 'application/json') );
+} );
+
 
 $c_question->get( '/{id}', function( $id, Request $request ) use ($app) {
 
