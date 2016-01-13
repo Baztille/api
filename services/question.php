@@ -73,6 +73,10 @@ class question
 			    $sorting = UX_QUESTION_SORTING_DATE_VOTED;
 		    else if( $status == 'decided' ) // Vote ended
 			    $sorting = UX_QUESTION_SORTING_DATE_DECIDED;
+			else if( $status == 'rejected' )
+			    $sorting = UX_QUESTION_SORTING_DATE_DECIDED;
+			else
+			    $sorting = UX_QUESTION_SORTING_VOTED;
         }
         
         if( $sorting == UX_QUESTION_SORTING_HOTTEST )
@@ -154,7 +158,7 @@ class question
         }
         else
         {
-		    throw new \Exception( "Unknow sorrting method" );        
+		    throw new \Exception( "Unknow sorrting method : ".$sorting );        
         }
         
         // Get all questions
