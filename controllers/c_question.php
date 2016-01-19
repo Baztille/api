@@ -48,6 +48,13 @@ $c_question->get( '/{id}', function( $id, Request $request ) use ($app) {
 	return $app->json( $app['wsrequest']->buildWsResponse( $question ), 201, array('Access-Control-Allow-Origin' => '*','Access-Control-Allow-Headers'=>'Content-Type', 'Content-Type' => 'application/json') );
 } );
 
+$c_question->get( '/{id}/{sorting}', function( $id, $sorting, Request $request ) use ($app) {
+
+	$question = $app['question']->getQuestionContent( $id, $sorting );
+	return $app->json( $app['wsrequest']->buildWsResponse( $question ), 201, array('Access-Control-Allow-Origin' => '*','Access-Control-Allow-Headers'=>'Content-Type', 'Content-Type' => 'application/json') );
+} );
+
+
 
 $c_question->post( '/vote', function (Request $request) use($app) {
     $id = $request->get('id');

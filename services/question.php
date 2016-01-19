@@ -220,7 +220,7 @@ class question
 		return $questions;
     }
     
-    public function getQuestionContent( $id )
+    public function getQuestionContent( $id, $sorting=UX_QUESTION_SORTING_HOTTEST )
     {
         global $g_config;
     
@@ -238,15 +238,82 @@ class question
 	  	{
 			$result = array();
 			$result['question'] = $res ;
-		
+
+
+            if( $sorting == UX_QUESTION_SORTING_HOTTEST )
+            {
+                $two_hours_ahead = time() + ( 2*3600 );
+
+		        $args_ordered = $db->args->aggregate( 
+		            array( 
+		            
+		                    array( '$match' => array( 'question' => $id ) ),
+		                    array( '$project' => array( 
+                                                  'score' => array( 
+                                                        '$divide' => array( 
+                                                             array(
+                                                                '$subtract' => array( '$vote', 0 )    // Divide number of votes minus one (don't take into account first voter)
+                                                             ),
+                                                             array( 
+                                                                '$subtract' => array( $two_hours_ahead, '$date' ) // By time since proposed, +2 hours
+                                                             ) )
+                                                   )
+                                              )
+                            ),
+                            array( '$sort' => array( 'score' => -1 ) )
+                            
+                         )
+                    );       
+
+
+                // Make sure the most voted arg is always first, anytime
+                $cursor = $db->args->find( array( 'question' => $id ), array( 'vote' => 1, 'date' => 1 ) )->sort( array( 'vote' => -1, 'date' => -1 ) );
+		        $arg = $cursor->getNext();
+                $first_arg_id = (string)$arg['_id'];
+
+                $args_ids = array( $first_arg_id );
+
+		        foreach( $args_ordered['result'] as $arg_in_order )
+		        {		    
+		            $arg_id = (string) $arg_in_order['_id'];
+		            if( $arg_id != $first_arg_id )
+        		        $args_ids[] = $arg_id;
+                }
+
+            }
+            else if( $sorting == UX_QUESTION_SORTING_RECENT )
+            {
+                $cursor = $db->args->find( array( 'question' => $id ), array( 'date' => 1 ) )->sort( array( 'date' => -1 ) );
+                $args_ids = array();
+		        while( $arg = $cursor->getNext() )
+		        {
+                    $args_ids[] = (string)$arg['_id'];
+                }
+            }        
+            else if( $sorting == UX_QUESTION_SORTING_VOTED )
+            {
+                $cursor = $db->args->find( array( 'question' => $id ), array( 'date' => 1 ) )->sort( array( 'vote' => -1 ) );
+                $args_ids = array();
+		        while( $arg = $cursor->getNext() )
+		        {
+                    $args_ids[] = (string)$arg['_id'];
+                }
+            }
+
 			// Get all args
 			$cursor = $db->args->find( array( 'question' => $id ) );
-			$cursor->sort( array( 'vote' => -1, 'date' => -1 ) );
-		
-			$parent_to_arglist = array();	// Parent to args
-				
+            $args_datas = array();
 			while( $arg = $cursor->getNext() )
 			{
+                $args_datas[ (string) $arg['_id'] ] = $arg;
+            }            
+		
+			$parent_to_arglist = array();	// Parent to args
+
+            foreach( $args_ids as $arg_id )
+            {				
+                $arg = $args_datas[ $arg_id ];
+
 				if( ! isset( $parent_to_arglist[ $arg['parent'] ] ) )
 					$parent_to_arglist[ $arg['parent'] ] = array();
 				$parent_to_arglist[ $arg['parent'] ][] = $arg;
