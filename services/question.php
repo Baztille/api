@@ -79,6 +79,11 @@ class question
 			    $sorting = UX_QUESTION_SORTING_VOTED;
         }
         
+        if( $category == UX_QUESTION_CATEGORY_ALL )
+            $matching =  array( 'status' => $status );
+        else
+            $matching = array( 'status' => $status, 'category' => $category );
+        
         if( $sorting == UX_QUESTION_SORTING_HOTTEST )
         {
             $two_hours_ahead = time() + ( 2*3600 );
@@ -86,7 +91,7 @@ class question
 		    $questions_ordered = $db->questions->aggregate( 
 		        array( 
 		        
-		                array( '$match' => array( 'status' => $status ) ),
+		                array( '$match' => $matching ),
 		                array( '$project' => array( 
                                               'score' => array( 
                                                     '$divide' => array( 
@@ -106,7 +111,7 @@ class question
 
 
             // Make sure the most voted question is always first, anytime
-            $cursor = $db->questions->find( array( 'status' => $status ), array( 'vote' => 1 ) )->sort( array( 'vote' => -1 ) );
+            $cursor = $db->questions->find( $matching, array( 'vote' => 1 ) )->sort( array( 'vote' => -1 ) );
 		    $question = $cursor->getNext();
             $first_question_id = (string)$question['_id'];
 
@@ -122,7 +127,7 @@ class question
         }
         else if( $sorting == UX_QUESTION_SORTING_RECENT )
         {
-            $cursor = $db->questions->find( array( 'status' => $status ), array( 'date_proposed' => 1 ) )->sort( array( 'date_proposed' => -1 ) );
+            $cursor = $db->questions->find( $matching, array( 'date_proposed' => 1 ) )->sort( array( 'date_proposed' => -1 ) );
             $questions_ids = array();
 		    while( $question = $cursor->getNext() )
 		    {
@@ -131,7 +136,7 @@ class question
         }        
         else if( $sorting == UX_QUESTION_SORTING_VOTED )
         {
-            $cursor = $db->questions->find( array( 'status' => $status ), array( 'vote' => 1 ) )->sort( array( 'vote' => -1 ) );
+            $cursor = $db->questions->find( $matching, array( 'vote' => 1 ) )->sort( array( 'vote' => -1 ) );
             $questions_ids = array();
 		    while( $question = $cursor->getNext() )
 		    {
@@ -140,7 +145,7 @@ class question
         }
         else if( $sorting == UX_QUESTION_SORTING_DATE_VOTED )
         {
-            $cursor = $db->questions->find( array( 'status' => $status ), array( 'date_vote' => 1 ) )->sort( array( 'date_vote' => 1 ) );
+            $cursor = $db->questions->find( $matching, array( 'date_vote' => 1 ) )->sort( array( 'date_vote' => 1 ) );
             $questions_ids = array();
 		    while( $question = $cursor->getNext() )
 		    {
@@ -149,7 +154,7 @@ class question
         }
         else if( $sorting == UX_QUESTION_SORTING_DATE_DECIDED )
         {
-            $cursor = $db->questions->find( array( 'status' => $status ), array( 'date_decided' => 1 ) )->sort( array( 'date_decided' => 1 ) );
+            $cursor = $db->questions->find( $matching, array( 'date_decided' => 1 ) )->sort( array( 'date_decided' => 1 ) );
             $questions_ids = array();
 		    while( $question = $cursor->getNext() )
 		    {
@@ -162,7 +167,7 @@ class question
         }
         
         // Get all questions
-        $cursor = $db->questions->find( array( 'status' => $status ) );
+        $cursor = $db->questions->find( $matching );
         $questions_data = array();
 		while( $question = $cursor->getNext() )
 		{
@@ -269,10 +274,16 @@ class question
                 // Make sure the most voted arg is always first, anytime
                 $cursor = $db->args->find( array( 'question' => $id ), array( 'vote' => 1, 'date' => 1 ) )->sort( array( 'vote' => -1, 'date' => -1 ) );
 		        $arg = $cursor->getNext();
-                $first_arg_id = (string)$arg['_id'];
+		        $first_arg_id = null;
+		        if( $arg )
+		        {
+                    $first_arg_id = (string)$arg['_id'];
 
-                $args_ids = array( $first_arg_id );
-
+                    $args_ids = array( $first_arg_id );
+                }
+                else
+                    $args_ids = array();
+                
 		        foreach( $args_ordered['result'] as $arg_in_order )
 		        {		    
 		            $arg_id = (string) $arg_in_order['_id'];
@@ -374,11 +385,13 @@ class question
 		}   
     }
     
-    public function proposeQuestion( $text )
+    public function proposeQuestion( $text, $category )
     {
 		$user = $this->app['current_user'];
 		$user->ensure_logged();
         $user->ensure_verified();
+        
+        $category = intval( $category );
 
 		$gamification = $this->app['gamification'];
 		
@@ -422,6 +435,7 @@ class question
 		        ),
 		        'status' => 'proposed', // proposed / ignored / vote / decided
 		        'date_proposed' => $timestamp,
+		        'category' => $category,
 		        'failedSelection' => 0,   // Number of times this questions has not been selected during a selection
 		        'author' => $user->id,
 		        'vote' => 0              // number of citizen who wants/wanted to vote on this one

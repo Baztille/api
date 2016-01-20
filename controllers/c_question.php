@@ -73,7 +73,8 @@ $c_question->post( '/vote/arg/{id}', function( $id, Request $request ) use ($app
 $c_question->post( '/propose', function (Request $request) use($app) {
 
     $text = $request->get('text');
-	$question_id = $app['question']->proposeQuestion( $text );
+    $category = $request->get('category', 0);
+	$question_id = $app['question']->proposeQuestion( $text, $category );
 	
 	return $app->json( $app['wsrequest']->buildWsResponse( array( 'id' => $question_id) ), 201, array('Access-Control-Allow-Origin' => '*','Access-Control-Allow-Headers'=>'Content-Type', 'Content-Type' => 'application/json') );
 } );
