@@ -356,5 +356,7 @@ class user
 	    $notifier = $this->app['notifier'];
         $notifier->sendEmailToAdmin( $title, $body, $email  );      
     }
+    
+
 
 }

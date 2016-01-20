@@ -51,11 +51,30 @@ $c_session->get( '/who_am_i', function( Request $request ) use ($app) {
 	return $app->json( $app['wsrequest']->buildWsResponse( $user->getdatas() ), 201, array('Access-Control-Allow-Origin' => '*','Access-Control-Allow-Headers'=>'Content-Type', 'Content-Type' => 'application/json') );
 } );
 
+$c_session->get( '/getMyInfos', function( Request $request ) use ($app) {
+
+	$user = $app['current_user'];
+
+	return $app->json( $app['wsrequest']->buildWsResponse( $user->getAllPlayersInfos() ), 201, array('Access-Control-Allow-Origin' => '*','Access-Control-Allow-Headers'=>'Content-Type', 'Content-Type' => 'application/json') );
+} );
+
+
 $c_session->get( '/myranking', function( Request $request ) use ($app) {
 
 	$user = $app['current_user'];
 	
 	return $app->json( $app['wsrequest']->buildWsResponse( $user->myranking() ), 201, array('Access-Control-Allow-Origin' => '*','Access-Control-Allow-Headers'=>'Content-Type', 'Content-Type' => 'application/json') );
+} );
+
+
+$c_session->post( '/changeOptin', function( Request $request ) use ($app) {
+
+    $email = $request->get('email');
+    $value = $request->get('optin');
+
+	$app['current_user']->changeOptin( $email, $value );
+	
+	return $app->json( $app['wsrequest']->buildWsResponse( array( 'ok' => 1 ) ), 201, array('Access-Control-Allow-Origin' => '*', 'Access-Control-Allow-Headers'=>'Content-Type','Content-Type' => 'application/json') );
 } );
 
 

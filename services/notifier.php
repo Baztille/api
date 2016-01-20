@@ -58,17 +58,21 @@ class notifier
     public function sendEmailToAllUsers( $title, $body )
     {
         // Send emails to the whole database
-        // TODO: filter user who unsubsribe the emails from this type
 
 		$m = new \MongoClient(); // connect
 		$db = $m->selectDB("baztille");
         
-        $cursor = $db->users->find( array(), array( 'email', 'username', 'lang' ) );
+        $cursor = $db->users->find( array(), array( 'email', 'username', 'lang', 'optout_votes' ) );
         while( $user = $cursor->getNext() )
         {
             if( $user['email'] != '' )
             {
-                $this->sendEmail( $user['email'], $title, $body );
+                if( isset( $user['optout_votes'] ) )
+                {
+                    // Filter user who unsubsribe the emails from this type...
+                }
+                else
+                    $this->sendEmail( $user['email'], $title, $body );
             }
         }        
     }

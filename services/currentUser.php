@@ -65,6 +65,18 @@ class currentUser
   		return $this->session;
   	}
 
+    public function getAllPlayersInfos()
+    {
+		$m = new \MongoClient(); // connect
+		$db = $m->selectDB("baztille");
+
+        $session = $this->getdatas();
+
+        $user = $db->users->findOne( array( '_id' => new \MongoId( $session['user_id'] ) ) , array(
+            'username'=>true,'email'=>true,'lang'=>true,'registration_date'=>true,'verified'=>true,'email_verified'=>true,'optout_votes'=>true,'optout_news'=>true) );
+        
+        return $user;
+    }
 
 	public function login( $username, $password )
 	{    
@@ -205,5 +217,42 @@ class currentUser
     {
     
     }
+    
+    public function changeOptin( $email, $value )
+    {
+		$m = new \MongoClient(); // connect
+		$db = $m->selectDB("baztille");
+
+        if( $email != 'votes' && $email != 'news' ) 
+    		throw new \Exception( "Invalid optin value" );
+        
+        // Get current user infos
+        $currentUser = $this->app['current_user']->getdatas();
+        $userdatas = $db->users->findOne( array( '_id' => new \MongoId( $currentUser['user_id'] ) ), array('optout_news'=>true, 'optout_votes'=>true) );
+
+        if( $value == false )
+        {
+            if( !isset( $userdatas['optout_'.$email ] ) )
+            {
+                // Set optout
+          		$db->users->update( 
+          			array( '_id' => new \MongoId( $currentUser['user_id'] ) ),
+          			array('$set' => array( 'optout_'.$email => true ) )
+          			);
+            }
+        }
+        else
+        {
+            if( isset( $userdatas['optout_'.$email ] ) )
+            {
+                // Unset this value
+          		$db->users->update( 
+          			array( '_id' => new \MongoId( $currentUser['user_id'] ) ),
+          			array('$unset' => array( 'optout_'.$email => true ) )
+          			);
+            }
+        
+        }    
+    }    
 
 }
