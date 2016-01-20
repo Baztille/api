@@ -82,7 +82,7 @@ class question
         if( $category == UX_QUESTION_CATEGORY_ALL )
             $matching =  array( 'status' => $status );
         else
-            $matching = array( 'status' => $status, 'category' => $category );
+            $matching = array( 'status' => $status, 'category' => intval($category) );
         
         if( $sorting == UX_QUESTION_SORTING_HOTTEST )
         {
