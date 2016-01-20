@@ -254,5 +254,27 @@ class currentUser
         
         }    
     }    
+    
+    public function removeAccount()
+    {
+		$m = new \MongoClient(); // connect
+		$db = $m->selectDB("baztille");
+
+        // Get current user infos
+        $currentUser = $this->app['current_user']->getdatas();
+        $userdatas = $db->users->findOne( array( '_id' => new \MongoId( $currentUser['user_id'] ) ), array('optout_news'=>true, 'optout_votes'=>true) );
+    
+        $db->users->update(
+      			array( '_id' => new \MongoId( $currentUser['user_id'] ) ),
+      			array('$set' => array( 
+      			        'username' => '(removed)',
+      			        'email' => '(removed)',
+      			        'points' => 0,
+      			        'removed' => 1,
+      			        'optout_votes' => true,
+      			        'optout_news' => true
+      			     ) )
+        );
+    }
 
 }

@@ -80,6 +80,9 @@ class notifier
     private function sendEmail( $email, $subject, $body, $reply_to='Baztille <contact@baztille.org>' )
     {
         global $g_config;
+        
+        if( $email == '(removed)' )
+            return ;    // Email from a removed user
     
         // Log this into a specific "mailsent" file
         $trace = $this->app['trace'];

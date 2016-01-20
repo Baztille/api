@@ -77,6 +77,12 @@ $c_session->post( '/changeOptin', function( Request $request ) use ($app) {
 	return $app->json( $app['wsrequest']->buildWsResponse( array( 'ok' => 1 ) ), 201, array('Access-Control-Allow-Origin' => '*', 'Access-Control-Allow-Headers'=>'Content-Type','Content-Type' => 'application/json') );
 } );
 
+$c_session->post( '/removeAccount', function( Request $request ) use ($app) {
+
+	$app['current_user']->removeAccount( );
+	
+	return $app->json( $app['wsrequest']->buildWsResponse( array( 'ok' => 1 ) ), 201, array('Access-Control-Allow-Origin' => '*', 'Access-Control-Allow-Headers'=>'Content-Type','Content-Type' => 'application/json') );
+} );
 
 
 return $c_session;
