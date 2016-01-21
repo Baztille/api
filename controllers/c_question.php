@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 
 $c_question = $app['controllers_factory'];
-
+$c_question->assert('sorting', '^[0-9]+$')->assert('category', '^[0-9]+$');
 
 $c_question->get( '/list/{status}/{page}', function( $status, $page ) use ($app) {
 
