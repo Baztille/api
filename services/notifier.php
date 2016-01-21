@@ -148,9 +148,9 @@ class notifier
         // 1°) Notify question author that his question has been selected
     
         $title = "Félicitations : votre question a été sélectionnée !";
-        $body = "<h1 class='baz_toptitle'>Bravo !</h1><br>La question que vous avez proposée (<i>\"".$question['text']."\"</i>) a été celle jugée la plus intéressante par la communauté Baztille et vient d'être proposée au vote.";
+        $body = "<h1 class=\"baz_toptitle\" style=\"font-weight:400;\">Bravo !</h1><br>La question que vous avez proposée (<i>\"".$question['text']."\"</i>) a été celle jugée la plus intéressante par la communauté Baztille et vient d'être proposée au vote.";
         //$body .= "\n\n";
-        $body .= "<br><a href=\"".$g_config['app_base_url'].'/#/question/questions/'.( (string)$question['_id'] )."\" class=\"btn-primary\">Voir la question</a>";
+        $body .= "<br><a href=\"".$g_config['app_base_url'].'/#/question/questions/'.( (string)$question['_id'] )."\" class=\"btn-primary\" style=\"background-color: #00A8D0; border-radius:5px; color: #fff; position: relative; display: inline-block;margin: 0;padding: 0 12px; min-width: 52px; min-height: 33px; vertical-align: top; text-align: center; text-overflow: ellipsis; font-size: 14px; line-height: 32px; margin-top:20px; margin-bottom:20px;\">Voir la question</a>";
         $body .= "<br>... et vous avez gagné 100 points Baztille !";
 
         $this->sendEmailToUniqueUser( $question['author'], $title, $body );
@@ -162,17 +162,17 @@ class notifier
     
         $subject = $question['text'];
         
-        $body = "<h1 class='baz_toptitle'>C'est le moment de voter !</h1><br>La question suivante est en débat pour une durée de ".$g_config['current_question_vote_delay']." jours.";
+        $body = "<h1 class=\"baz_toptitle\" style=\"font-weight:400;\">C'est le moment de voter !</h1><br>La question suivante est en débat pour une durée de ".$g_config['current_question_vote_delay']." jours.";
         $body .= "<br><br><b>".$question['text']."</b>";
-        $body .= "<br><a href=\"".$g_config['app_base_url'].'/#/question/questions/'.( (string)$question['_id'] )."\" class=\"btn-primary\">Votez</a>";
+        $body .= "<br><a href=\"".$g_config['app_base_url'].'/#/question/questions/'.( (string)$question['_id'] )."\" class=\"btn-primary\" style=\"background-color: #00A8D0; border-radius:5px; color: #fff; position: relative; display: inline-block;margin: 0;padding: 0 12px; min-width: 52px; min-height: 33px; vertical-align: top; text-align: center; text-overflow: ellipsis; font-size: 14px; line-height: 32px; margin-top:20px; margin-bottom:20px;\">Votez</a>";
         
         //$body .= "<h2>Proposez la prochaine question</h2>";
         $body .= "<br><br>Vous pouvez aussi proposer et choisir la question qui sera posée la semaine prochaine.";
-        $body .= "<br><a href=\"".$g_config['app_base_url']."/#/question/proposed\" class=\"btn-secondary\">Proposez une question</a>";
+        $body .= "<br><a href=\"".$g_config['app_base_url']."/#/question/proposed\" class=\"btn-secondary\" style=\"color: #000; position: relative; display: inline-block; vertical-align: top; text-align: center; text-overflow: ellipsis; margin-top:10px; margin-bottom:10px; text-decoration:underline;\">Proposez une question</a>";
                 
         // Last decisions
         
-        $body .= "<h2>Résultats des derniers votes</h2><br>";
+        $body .= "<h2 style=\"font-weight:400;\">Résultats des derniers votes</h2><br>";
 
 		// Last questions voted
         $days_ago = time() - 31*24*3600;
@@ -193,7 +193,7 @@ class notifier
             if( $n>2 )
                 break;
         }     
-        $body .= "<br><a href=\"".$g_config['app_base_url']."/#/question/voted\" class=\"btn-secondary\">Tous les résultats</a> ";
+        $body .= "<br><a href=\"".$g_config['app_base_url']."/#/question/voted\" class=\"btn-secondary\"  style=\"color: #000; position: relative; display: inline-block; vertical-align: top; text-align: center; text-overflow: ellipsis; margin-top:10px; margin-bottom:10px; text-decoration:underline;\">Tous les résultats</a> ";
 
         $this->sendEmailToAllUsers( $subject, $body );
     }
@@ -230,9 +230,9 @@ class notifier
             if( $answer['author'] )
             {
                 $title = "Félicitations : votre réponse a été approuvée !";
-                $body = "<h1 class='baz_toptitle'>Bravo !</h1><br>la réponse que vous avez proposée (\"<i>".$answer['text']."</i>\") pour la question \"<i>".$question['text']."</i>\" a été approuvée par la communauté Baztille.";
+                $body = "<h1 class=\"baz_toptitle\" style=\"font-weight:400;\">Bravo !</h1><br>la réponse que vous avez proposée (\"<i>".$answer['text']."</i>\") pour la question \"<i>".$question['text']."</i>\" a été approuvée par la communauté Baztille.";
 
-                $body .= "<br><a href=\"".$g_config['app_base_url'].'/#/question/questions/'.( (string)$question['_id'] )."\" class=\"btn-primary\">Voir la question</a>";
+                $body .= "<br><a href=\"".$g_config['app_base_url'].'/#/question/questions/'.( (string)$question['_id'] )."\" class=\"btn-primary\" style=\"background-color: #00A8D0; border-radius:5px; color: #fff; position: relative; display: inline-block;margin: 0;padding: 0 12px; min-width: 52px; min-height: 33px; vertical-align: top; text-align: center; text-overflow: ellipsis; font-size: 14px; line-height: 32px; margin-top:20px; margin-bottom:20px;\">Voir la question</a>";
                 $body .= "<br>... et vous avez gagné 100 points Baztille !";
 
                 $this->sendEmailToUniqueUser( $answer['author'], $title, $body );
@@ -245,11 +245,11 @@ class notifier
         $subject = "Résultat du vote : ".$bestAnswer['text'];
         
         if( count( $question['validanswers'] ) == 1 )
-            $body = "<h1 class='baz_toptitle'>Vote terminé</h1><br>Le vote sur la question \"".$question['text']."\" est maintenant terminé et la réponse ci-dessous a été approuvée par la communauté Baztille :";
+            $body = "<h1 class=\"baz_toptitle\" style=\"font-weight:400;\">Vote terminé</h1><br>Le vote sur la question \"".$question['text']."\" est maintenant terminé et la réponse ci-dessous a été approuvée par la communauté Baztille :";
         else
-            $body = "<h1 class='baz_toptitle'>Vote terminé</h1><br>Le vote sur la question \"".$question['text']."\" est maintenant terminé et les réponses ci-dessous ont été approuvées par la communauté Baztille :";
+            $body = "<h1 class=\"baz_toptitle\" style=\"font-weight:400;\">Vote terminé</h1><br>Le vote sur la question <i>\"".$question['text']."\"</i> est maintenant terminé et les réponses ci-dessous ont été approuvées par la communauté Baztille :";
 
-        $body .= "<br>";
+        $body .= "<br><br>";
         foreach( $question['validanswers'] as $validanswer )
         {
             $body .= "<b>".$validanswer['text']."</b>";
@@ -258,11 +258,11 @@ class notifier
         $body .= "<br><br>";
 
         $body .= "Il vous reste encore 24h pour décider de la prochaine question qui sera posée à la communauté :";
-        $body .= "<br><a href=\"".$g_config['app_base_url']."/#/question/proposed\" class=\"btn-primary\">Voir les question</a>";
+        $body .= "<br><a href=\"".$g_config['app_base_url']."/#/question/proposed\" class=\"btn-primary\" style=\"background-color: #00A8D0; border-radius:5px; color: #fff; position: relative; display: inline-block;margin: 0;padding: 0 12px; min-width: 52px; min-height: 33px; vertical-align: top; text-align: center; text-overflow: ellipsis; font-size: 14px; line-height: 32px; margin-top:20px; margin-bottom:20px;\">Voir les question</a>";
 
         // Last decisions
         
-        $body .= "<h2>Résultats des derniers votes</h2><br>";
+        $body .= "<h2 style=\"font-weight:400;\">Résultats des derniers votes</h2><br>";
 
 		// Last questions voted
         $days_ago = time() - 31*24*3600;
@@ -284,7 +284,7 @@ class notifier
             if( $n>2 )
                 break;
         }   
-        $body .= "<br><a href=\"".$g_config['app_base_url']."/#/question/voted\" class=\"btn-secondary\">Tous les résultats</a> ";
+        $body .= "<br><a href=\"".$g_config['app_base_url']."/#/question/voted\" class=\"btn-secondary\"  style=\"color: #000; position: relative; display: inline-block; vertical-align: top; text-align: center; text-overflow: ellipsis; margin-top:10px; margin-bottom:10px; text-decoration:underline;\">Tous les résultats</a> ";
         
         $this->sendEmailToAllUsers( $subject, $body );
     }
