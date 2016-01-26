@@ -39,7 +39,7 @@ $c_news->get( '/list', function(  ) use ($app) {
         $clean_res = strstr($res, '{');   
         
         $news = json_decode( $clean_res, true );
-        $news = $news['payload']['latestPosts'];
+        $news = $news['payload']['posts'];
     }
 
     return $app->json( $app['wsrequest']->buildWsResponse( $news ), 201, array('Access-Control-Allow-Origin' => '*', 'Access-Control-Allow-Headers'=>'Content-Type','Content-Type' => 'application/json') );

@@ -57,7 +57,7 @@ class jobs
             )
         ));
 
-        $res = file_get_contents('https://medium.com/@baztille?format=json', false, $ctx);
+        $res = file_get_contents('https://medium.com/@baztille/latest?format=json', false, $ctx);
 
         if( $res === false )
         {
@@ -71,7 +71,7 @@ class jobs
             file_put_contents( '/var/baztille-data/news/news.json', $clean_res );
             
             $news = json_decode( $clean_res, true );
-            $news = $news['payload']['latestPosts'];
+            $news = $news['payload']['posts'];
             
             // Then, get news one by one
             foreach( $news as $onenews )
