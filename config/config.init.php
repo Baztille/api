@@ -67,4 +67,7 @@ $g_config['send_real_emails'] = true;
 
 
 
+$g_config['moderation_password'] = '12345';
+
+
 
