@@ -48,6 +48,18 @@ $c_admin->post( '/dailyNotification', function( Request $request ) use ($app) {
 	return $app->json( $app['wsrequest']->buildWsResponse( array( 'ok' => 1 ) ), 201, array('Access-Control-Allow-Origin' => '*','Access-Control-Allow-Headers'=>'Content-Type', 'Content-Type' => 'application/json') );
 } );
 
+$c_admin->get( '/moderationpanel', function( Request $request ) use ($app) {
+
+    global $g_config;
+
+    if( $request->get('key') != $g_config['moderation_password'] )
+        die(':(');
+    
+    $id = $request->get('id');
+    $bAccept = $request->get('accept')==1;
+    
+    return $app['questionFlow']->getModerationPanel( $id, $bAccept );
+} );
 
 
 return $c_admin;

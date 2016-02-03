@@ -190,4 +190,39 @@ class questionFlow
         $notifier->sendEmailToUniqueUser( '5614c5f2ce4248861c8b4567', 'test sub', 'test content' );
     }
 
+    function getModerationPanel( $question_to_change=null, $bAccept=null )
+    {
+        $html = "<h1>Moderation panel</h1>";
+    
+		$m = new \MongoClient(); // connect
+		$db = $m->selectDB("baztille");
+
+        if( $question_to_change !== null )
+        {
+            if( $bAccept )
+            {
+            
+            }
+            else
+            {
+                // Remove this entry
+                $db->questionUpdateRequests->remove( array( '_id' => new \MongoId((string)$question_to_change) ) );
+            }
+        }
+
+        $cursor = $db->questionUpdateRequests->find();
+		while( $request = $cursor->getNext() )
+		{
+		    $html .=  "- ".$request['before'].'<br/>';
+		    $html .=  "+ ".$request['after'].'<br/>';
+		    $html .= "<a href='/admin/moderationpanel?key=12345&id=".$request['question_id']."&accept=0'>Refuse</a> / ";
+		    $html .= "<a href='/admin/moderationpanel?key=12345&id=".$request['question_id']."&accept=1'>Accept</a>";
+		    
+		    $html .= "<br><br>";
+        }        
+        
+    
+        return $html;
+    }
+
 }
