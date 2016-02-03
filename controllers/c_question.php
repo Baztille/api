@@ -80,6 +80,16 @@ $c_question->post( '/propose', function (Request $request) use($app) {
 } );
 
 
+$c_question->post( '/updateQuestion', function (Request $request) use($app) {
+
+    $question_id = $request->get('id');
+    $text = $request->get('text');
+    $category = $request->get('category', 0);
+	$question_id = $app['question']->updateQuestion( $question_id, $text, $category );
+	
+	return $app->json( $app['wsrequest']->buildWsResponse( array( 'id' => $question_id) ), 201, array('Access-Control-Allow-Origin' => '*','Access-Control-Allow-Headers'=>'Content-Type', 'Content-Type' => 'application/json') );
+} );
+
 
 $c_question->post( '/{id}/postarg', function( $id, Request $request ) use ($app) {
 

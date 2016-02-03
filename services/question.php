@@ -230,9 +230,16 @@ class question
         global $g_config;
     
 		$user = $this->app['current_user'];
+		$user_id = null;
+        if( $user->is_logged() )
+        {
+            $user_id = $user->id;
+        }
 
 		$m = new \MongoClient(); // connect
 		$db = $m->selectDB("baztille");
+		
+		
 
 		// Get this question	
 		$res = $db->questions->findOne( array( '_id' => new \MongoId( $id )) );    
@@ -324,6 +331,9 @@ class question
             foreach( $args_ids as $arg_id )
             {				
                 $arg = $args_datas[ $arg_id ];
+                
+                if( $arg['author'] == $user_id )
+                    $arg['author_is_you'] = true;
 
 				if( ! isset( $parent_to_arglist[ $arg['parent'] ] ) )
 					$parent_to_arglist[ $arg['parent'] ] = array();
@@ -380,6 +390,9 @@ class question
 			    $result['question']['date_vote_end'] = $result['question']['date_vote'] + $g_config['current_question_vote_delay']*24*3600;
 			}
 			
+			
+			if( $result['question']['author'] == $user_id )
+			    $result['question']['author_is_you'] = true;
 			
 			return $result;
 		}   
@@ -459,6 +472,89 @@ class question
 		}
 		
 	}
+	
+	public function updateQuestion( $question_id, $text, $category )
+    {
+		$user = $this->app['current_user'];
+		$user->ensure_logged();
+        $user->ensure_verified();
+
+		$m = new  \MongoClient(); // connect
+		$db = $m->selectDB("baztille");
+
+        $user_id = $user->id;
+
+     
+        // Get the current question
+		$question = $db->questions->findOne( array( '_id' => new \MongoId( $question_id )) );    
+		
+		if( $question===null )
+			return "Question not found";
+
+        // We can only modify question that has not been voted yet
+		if( $question['status'] != 'proposed' && $question['status'] != 'vote' )
+			return "Le débat sur cette question est maintenant terminé";
+
+		// Perform checks (ex: length)
+		//   check the answer does not exists already TODO
+		//   check users limits
+		if( strlen( $text ) < 10 )
+		    throw new \Exception( "Votre contribution doit au moins faire 10 caractères." );
+		if( strlen( $text ) > 200 )
+		    throw new \Exception( "Votre contribution est trop longue." );
+        
+        // I can do an immediate update in the following case:
+        //  1. I am the author   
+        //  2. Nobody except me has voted for this question
+
+        $bImmediateModif = false;
+        if( $question['author'] == (string)$user_id )
+        {
+            // Who votes for this question ???
+            $count_votes = $db->questionvotes->find( array( 'question' => $question_id, 'user' => array( '$ne' => $user_id ) ), array( 'user' ) )->count();
+
+            if( $count_votes == 0 )
+            {
+                $bImmediateModif = true;
+            }
+        }
+        
+        if( $bImmediateModif )
+        {
+            // Save the previous text in "history" field
+            $db->questions->update(
+      			array( '_id' => new \MongoId( $question_id )),
+      			array(
+      			    '$push' => array( 'history' => array( 'text' => $question['text'] ) )
+      			)            
+            );
+        
+      		$db->questions->update( 
+      			array( '_id' => new \MongoId( $question_id )),
+      			    array( '$set' => array("text" => $text) ),
+      			    array( '$set' => array("category" => $category) )
+      			);
+      			
+            return $question_id;
+        }
+        else
+        {
+            // Add this update to the moderators panel
+            $db->questionUpdateRequests->insert(
+            
+                array(
+                    'question_id' => $question_id,
+                    'author' => $user_id,
+                    'before' => $question['text'],
+                    'after' => $text,
+                    'date' => time()
+                )
+            
+            );
+        
+            return 0;
+        }
+    }
 	
 	public function postArg( $id, $text, $parent )
 	{
