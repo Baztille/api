@@ -528,11 +528,10 @@ class question
       			    '$push' => array( 'history' => array( 'text' => $question['text'] ) )
       			)            
             );
-        
+
       		$db->questions->update( 
       			array( '_id' => new \MongoId( $question_id )),
-      			    array( '$set' => array("text" => $text) ),
-      			    array( '$set' => array("category" => $category) )
+      			    array( '$set' => array("text" => $text, "category" => intval($category)) )
       			);
       			
             return $question_id;
