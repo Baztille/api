@@ -28,6 +28,7 @@ use Symfony\Component\HttpFoundation\Request;
 $c_question = $app['controllers_factory'];
 $c_question->assert('sorting', '^[0-9]+$')->assert('category', '^[0-9]+$');
 
+// DEPRECATED : should use pagelist instead
 $c_question->get( '/list/{status}/{page}', function( $status, $page ) use ($app) {
 
 	$questions = $app['question']->listQuestions( $status, $page );
@@ -35,11 +36,21 @@ $c_question->get( '/list/{status}/{page}', function( $status, $page ) use ($app)
 } );
 
 
+// DEPRECATED : should use pagelist instead
 $c_question->get( '/list/{status}/{page}/{category}/{sorting}', function( $status, $page, $category, $sorting ) use ($app) {
 
 	$questions = $app['question']->listQuestions( $status, $page, $category, $sorting );
     return $app->json( $app['wsrequest']->buildWsResponse( $questions ), 201, array('Access-Control-Allow-Origin' => '*', 'Access-Control-Allow-Headers'=>'Content-Type','Content-Type' => 'application/json') );
 } );
+
+
+$c_question->get( '/pagelist/{status}/{page}/{category}/{sorting}', function( $status, $page, $category, $sorting ) use ($app) {
+
+	$questions = $app['question']->listQuestions( $status, $page, $category, $sorting, 10 ); // Pagination (10 questions per page)
+    return $app->json( $app['wsrequest']->buildWsResponse( $questions ), 201, array('Access-Control-Allow-Origin' => '*', 'Access-Control-Allow-Headers'=>'Content-Type','Content-Type' => 'application/json') );
+} );
+
+
 
 
 $c_question->get( '/{id}', function( $id, Request $request ) use ($app) {

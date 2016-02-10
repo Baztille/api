@@ -56,7 +56,7 @@ class question
     	$this->app = $app;
     }
     
-    public function listQuestions( $status, $page, $category=UX_QUESTION_CATEGORY_ALL, $sorting=UX_QUESTION_SORTING_CHOOSE_BEST )
+    public function listQuestions( $status, $page, $category=UX_QUESTION_CATEGORY_ALL, $sorting=UX_QUESTION_SORTING_CHOOSE_BEST, $questions_per_page=40 )
     {
         global $g_config;
 		$m = new \MongoClient(); // connect
@@ -177,36 +177,47 @@ class question
 		// Build answer
 		$questions = array( 'list' => array() );
 		
+		// Pagination management
+        $question_position = 1;
+		$from = 1 + ( ( $page - 1 ) * $questions_per_page );
+		$to = $from + $questions_per_page-1;
+		
+		
 		foreach( $questions_ids as $question_id )
 		{
-		    if( isset( $questions_data[ $question_id ] ) )
-		    {		    
-		        $question = $questions_data[ $question_id ];
-		        
-			    if( $status == 'vote' || $status == 'proposed' )
-			    {
-				    // Retrieve current best answer
-				    $argcursor = $db->args->find( array( 'question' => (string)$question['_id'], 'parent' => 0 ) );
-				    $argcursor->sort( array( 'vote' => -1 ) );
-				    $question['bestAnswer'] = array( $argcursor->getNext() );
-				    $question['nbReponse'] = $argcursor->count();
-			    }
+		    if( $question_position >= $from && $question_position <= $to )
+		    {		
+		        if( isset( $questions_data[ $question_id ] ) )
+		        {		    
+		            $question = $questions_data[ $question_id ];
+		            
+			        if( $status == 'vote' || $status == 'proposed' )
+			        {
+				        // Retrieve current best answer
+				        $argcursor = $db->args->find( array( 'question' => (string)$question['_id'], 'parent' => 0 ) );
+				        $argcursor->sort( array( 'vote' => -1 ) );
+				        $question['bestAnswer'] = array( $argcursor->getNext() );
+				        $question['nbReponse'] = $argcursor->count();
+			        }
 			
-			    if( $status == 'proposed' )
-			    {
-			        if( ! isset( $question['failedSelection'] ) )
-			            $question['failedSelection'] = 0;
+			        if( $status == 'proposed' )
+			        {
+			            if( ! isset( $question['failedSelection'] ) )
+			                $question['failedSelection'] = 0;
 
-			        $question['remaining_attempts'] = ( $g_config['proposed_questions_selection_max_attempts'] - $question['failedSelection'] );
-			    }
-			    if( $status == 'vote' )
-			    {
-			        $question['date_vote_end'] = $question['date_vote'] + $g_config['current_question_vote_delay']*24*3600;
-			    }
+			            $question['remaining_attempts'] = ( $g_config['proposed_questions_selection_max_attempts'] - $question['failedSelection'] );
+			        }
+			        if( $status == 'vote' )
+			        {
+			            $question['date_vote_end'] = $question['date_vote'] + $g_config['current_question_vote_delay']*24*3600;
+			        }
 
 
-		        $questions['list'][] = $question;
+		            $questions['list'][] = $question;
+                }
             }
+            
+            $question_position ++;
 		}    
 
 		$user = $this->app['current_user'];
