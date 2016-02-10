@@ -62,7 +62,7 @@ class notifier
 		$m = new \MongoClient(); // connect
 		$db = $m->selectDB("baztille");
         
-        $cursor = $db->users->find( array(), array( 'email', 'username', 'lang', 'optout_votes' ) );
+        $cursor = $db->users->find( array(), array( 'email', 'username', 'lang', 'optout_votes' ) )->sort( array( 'registration_date' => -1 ) );
         while( $user = $cursor->getNext() )
         {
             if( $user['email'] != '' )
@@ -88,18 +88,24 @@ class notifier
         $trace = $this->app['trace'];
         $trace->email_log( $email, $email, 'fr', $subject, $body );
 
-        if( $g_config['send_real_emails'] ) {
-            $message = \Swift_Message::newInstance()
-            ->setCharset('utf-8')
-            ->setSubject($subject)
-            ->setTo($email)
-            ->setFrom(array('contact@baztille.org' => 'Baztille'))
-            ->setReplyTo(array('contact@baztille.org' => 'Baztille'))
-            ->setBody($this->app['twig']->render('email.html.twig', array('body'=> $body, 'subject' => $subject, 'appbaseurl' => $g_config['app_base_url'])), 'text/html');
+        try {
+            if( $g_config['send_real_emails'] ) {
+                $message = \Swift_Message::newInstance()
+                ->setCharset('utf-8')
+                ->setSubject($subject)
+                ->setTo($email)
+                ->setFrom(array('contact@baztille.org' => 'Baztille'))
+                ->setReplyTo(array('contact@baztille.org' => 'Baztille'))
+                ->setBody($this->app['twig']->render('email.html.twig', array('body'=> $body, 'subject' => $subject, 'appbaseurl' => $g_config['app_base_url'])), 'text/html');
 
-            $this->app['mailer']->send($message);
+                $this->app['mailer']->send($message);
+            }
         }
-            
+        catch( Exception $e) {
+            // Log exception
+            $trace->logFatalException( $e );
+        }
+
     }
 
     public function sendMobileNotifToUniqueUser( $user_id, $body )

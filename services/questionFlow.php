@@ -149,7 +149,7 @@ class questionFlow
                 $gamification->onAnswerApproved( $question['author'] );
             }
         }
-        
+
 	    $notifier = $this->app['notifier'];
         $notifier->onAnswerApproved( $question );        		
 	}
