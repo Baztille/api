@@ -101,7 +101,7 @@ class notifier
                 $this->app['mailer']->send($message);
             }
         }
-        catch( Exception $e) {
+        catch(\Exception $e) {
             // Log exception
             $trace->logFatalException( $e );
         }
