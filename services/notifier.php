@@ -95,13 +95,13 @@ class notifier
                 ->setSubject($subject)
                 ->setTo($email)
                 ->setFrom(array('contact@baztille.org' => 'Baztille'))
-                ->setReplyTo(array('contact@baztille.org' => 'Baztille'))
+                ->setReplyTo(array( $reply_to ))
                 ->setBody($this->app['twig']->render('email.html.twig', array('body'=> $body, 'subject' => $subject, 'appbaseurl' => $g_config['app_base_url'])), 'text/html');
 
                 $this->app['mailer']->send($message);
             }
         }
-        catch(\Exception $e) {
+        catch( \Exception $e) {
             // Log exception
             $trace->logFatalException( $e );
         }
