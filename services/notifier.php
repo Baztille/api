@@ -77,7 +77,7 @@ class notifier
         }        
     }
     
-    private function sendEmail( $email, $subject, $body, $reply_to='Baztille <contact@baztille.org>' )
+    private function sendEmail( $email, $subject, $body, $reply_to=array('contact@baztille.org' => 'Baztille') )
     {
         global $g_config;
         
@@ -95,7 +95,7 @@ class notifier
                 ->setSubject($subject)
                 ->setTo($email)
                 ->setFrom(array('contact@baztille.org' => 'Baztille'))
-                ->setReplyTo(array( $reply_to ))
+                ->setReplyTo( $reply_to )
                 ->setBody($this->app['twig']->render('email.html.twig', array('body'=> $body, 'subject' => $subject, 'appbaseurl' => $g_config['app_base_url'])), 'text/html');
 
                 $this->app['mailer']->send($message);
