@@ -206,6 +206,7 @@ class notifier
 
     // Called when a proposed question is rejected (after X attemps)
     // (used to notify approved answer author)
+    // DEPRECATED : now we leave question proposed until they are selected    
     public function onQuestionRejected( $question )
     {
         // TODO

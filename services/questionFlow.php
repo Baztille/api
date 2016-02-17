@@ -74,7 +74,8 @@ class questionFlow
             $gamification->onQuestionSelected( $question['author'] );
         }
         
-        $this->rejectProposed();
+        // DEPRECATED : now we leave question proposed until they are selected
+        //$this->rejectProposed();
 
         // Then, notify everyone that this question is now available
 	    $notifier = $this->app['notifier'];
@@ -84,6 +85,7 @@ class questionFlow
 	}
 
     // Reject questions proposed with too much failed selection
+    // DEPRECATED : now we leave question proposed until they are selected
     private function rejectProposed()
     {
         global $g_config;
