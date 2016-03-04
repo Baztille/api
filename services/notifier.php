@@ -297,5 +297,36 @@ class notifier
     }
 
 
+    public function onQuestionToModerate( $to_moderate )
+    {
+        global $g_config;
+    
+        $title = "New moderation request";
+        $body = "Someone asks to replace :\n\n";
+        $body .= $to_moderate['before'];
+
+	    if( isset( $to_moderate['before_category'] ) )
+	        $body .= ' / '.$g_config['categories'][ $to_moderate['before_category'] ];
+	    $body .= "\n\n";
+
+
+        $body .= "by :\n\n";
+        $body .= $to_moderate['after'];
+	    if( isset( $to_moderate['after_category'] ) )
+	        $body .= ' / '.$g_config['categories'][ $to_moderate['after_category'] ];
+	    $body .= "\n\n";
+
+
+        $url_accept = $g_config['app_webservice_url'].'/admin/moderationpanel?key='.$g_config['moderation_password'].'&id='.$to_moderate['_id'].'&accept=1';
+        $url_refuse = 'http://ws.far.baztille.org/admin/moderationpanel?key=12345&id='.$to_moderate['_id'].'&accept=0';
+
+        $body .= "To accept : ".$url_accept."\n\n";
+        $body .= "To refuse : ".$url_refuse."\n\n";
+    
+        foreach( $g_config['moderators_emails'] as $email )
+        {
+            $this->sendEmail( $email, $title, $body );    
+        }
+    }
 
 }

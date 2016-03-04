@@ -201,24 +201,63 @@ class questionFlow
 
         if( $question_to_change !== null )
         {
-            if( $bAccept )
+            $change = $db->questionUpdateRequests->findOne( array( '_id' => new \MongoId((string)$question_to_change) ) ) ;
+
+            if( $change !== null )
             {
-            
-            }
-            else
-            {
-                // Remove this entry
-                $db->questionUpdateRequests->remove( array( '_id' => new \MongoId((string)$question_to_change) ) );
+                if( $bAccept )
+                {
+                   $question_id = $change['question_id'];
+		           $question = $db->questions->findOne( array( '_id' => new \MongoId( $question_id )) );    
+		
+		           if( $question!==null )
+                   {
+                        // Save the previous text in "history" field
+                        $db->questions->update(
+                  			array( '_id' => new \MongoId( $question_id )),
+                  			array(
+                  			    '$push' => array( 'history' => array( 'text' => $question['text'], 'removed_time'=>time() ) )
+                  			)            
+                        );
+
+                        // Replace the question
+                  		$db->questions->update( 
+                  			array( '_id' => new \MongoId( $question_id )),
+                  			    array( '$set' => array( "text" => $change['after'], "category" => $change['after_category'] ) ) 
+                  			);
+
+                        // Remove this entry
+                        $db->questionUpdateRequests->remove( array( '_id' => new \MongoId((string)$question_to_change) ) );
+
+                   }
+
+                }
+                else
+                {
+                    // Remove this entry
+                    $db->questionUpdateRequests->remove( array( '_id' => new \MongoId((string)$question_to_change) ) );
+                }
             }
         }
 
+        global $g_config;
         $cursor = $db->questionUpdateRequests->find();
 		while( $request = $cursor->getNext() )
 		{
-		    $html .=  "- ".$request['before'].'<br/>';
-		    $html .=  "+ ".$request['after'].'<br/>';
-		    $html .= "<a href='/admin/moderationpanel?key=12345&id=".$request['question_id']."&accept=0'>Refuse</a> / ";
-		    $html .= "<a href='/admin/moderationpanel?key=12345&id=".$request['question_id']."&accept=1'>Accept</a>";
+		    $html .=  "- ".$request['before'];
+		    
+		    if( isset( $request['before_category'] ) )
+		        $html .= ' / '.$g_config['categories'][ $request['before_category'] ];
+		    $html .= '<br/>';
+		    
+		    $html .=  "+ ".$request['after'];
+
+		    if( isset( $request['after_category'] ) )
+		        $html .= ' / '.$g_config['categories'][ $request['after_category'] ];
+		    $html .= '<br/>';
+
+		    $html .= "<a href='/admin/moderationpanel?key=".$g_config['moderation_password']."&id=".$request['_id']."&accept=0'>Refuse</a> / ";
+		    $html .= "<a href='/admin/moderationpanel?key=".$g_config['moderation_password']."&id=".$request['_id']."&accept=1'>Accept</a>";
 		    
 		    $html .= "<br><br>";
         }        

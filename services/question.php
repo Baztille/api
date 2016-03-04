@@ -536,7 +536,7 @@ class question
             $db->questions->update(
       			array( '_id' => new \MongoId( $question_id )),
       			array(
-      			    '$push' => array( 'history' => array( 'text' => $question['text'] ) )
+      			    '$push' => array( 'history' => array( 'text' => $question['text'], 'removed_time'=>time() ) )
       			)            
             );
 
@@ -549,18 +549,25 @@ class question
         }
         else
         {
-            // Add this update to the moderators panel
-            $db->questionUpdateRequests->insert(
-            
-                array(
+            $to_moderate = array(
                     'question_id' => $question_id,
                     'author' => $user_id,
                     'before' => $question['text'],
                     'after' => $text,
+                    'before_category' => $question['category'],
+                    'after_category' => $category,
                     'date' => time()
-                )
-            
+                );
+        
+            // Add this update to the moderators panel
+            $res = $db->questionUpdateRequests->insert(
+                $to_moderate
             );
+            
+            // Notify admins that there is a new string to moderate.
+	        $notifier = $this->app['notifier'];
+            $notifier->onQuestionToModerate( $to_moderate );
+            
         
             return 0;
         }

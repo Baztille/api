@@ -69,5 +69,29 @@ $g_config['send_real_emails'] = true;
 
 $g_config['moderation_password'] = '12345';
 
+$g_config['moderators_emails'] = array();
+
+
+// Categories
+// (note : must be identical to the list in APP ux_question.js)
+
+$g_config['categories'] = array(
+    1 => 'aucune',
+    2 => 'Culture', 
+    3 => 'Economie', 
+    4 => 'Education', 
+    5 => 'Environnement',
+    6 => 'Etat',
+    7 => 'International',
+    8 => 'Justice',
+    9 => 'Recherche',
+    10 => 'Santé',
+    11 => 'Sécurité',
+    12 => 'Societé',
+    13 => 'Travail',
+    14 => 'Baztille',
+    15 => 'Autres'
+);
+
 
 
