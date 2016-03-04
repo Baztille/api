@@ -52,8 +52,9 @@ $c_user->post( '/notifwebhook', function( Request $request ) use ($app) {
         $request->request->replace( is_array( $data ) ? $data : array() );
         
         // Store it in DB
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
         $db->webhook->insert( $data );
         
     	return $app->json( $app['wsrequest']->buildWsResponse( $data ), 201, array('Access-Control-Allow-Origin' => '*','Access-Control-Allow-Headers'=>'Content-Type', 'Content-Type' => 'application/json') );

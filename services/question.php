@@ -60,7 +60,7 @@ class question
     {
         global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 		
 		// List questions with this status
 
@@ -248,7 +248,7 @@ class question
         }
 
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 		
 		
 
@@ -429,8 +429,9 @@ class question
 		
 		$timestamp = time();
 		
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
 		// Check if a identical question does not exists already as "proposed"
         $existing = $db->questions->findOne( array(
@@ -490,8 +491,9 @@ class question
 		$user->ensure_logged();
         $user->ensure_verified();
 
-		$m = new  \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+        global $g_config;
+		$m = new \MongoClient(); // connect
+		$db = $m->selectDB( $g_config['db_name'] );
 
         $user_id = $user->id;
 
@@ -581,8 +583,9 @@ class question
 
 		$gamification = $this->app['gamification'];
 
-		$m = new  \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+        global $g_config;
+		$m = new \MongoClient(); // connect
+		$db = $m->selectDB( $g_config['db_name'] );
 
 		// Perform checks (ex: length)
 		//   check the answer does not exists already TODO
@@ -676,8 +679,9 @@ class question
 		
 		$gamification = $this->app['gamification'];
 		
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
 		$question = $db->questions->findOne( array( '_id' => new \MongoId( $id )) );    
 		
@@ -757,8 +761,9 @@ class question
 
 		$gamification = $this->app['gamification'];
 		
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
 		$arg = $db->args->findOne( array( '_id' => new \MongoId( $id )) );    
 
@@ -852,8 +857,9 @@ class question
 	public function getQuestionVoters( $question_id )
 	{
 	
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
         // Get this question
 		$result = $db->questions->findOne( array( '_id' => new \MongoId( $question_id )) );    
@@ -883,8 +889,9 @@ class question
 	// Return all users that vote for that answer/arg
 	public function getVoters( $arg_id )
 	{
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
         // Get this question
 		$result = $db->args->findOne( array( '_id' => new \MongoId( $arg_id )) );    

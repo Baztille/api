@@ -36,8 +36,9 @@ class currentUser
 
 		if( $session && $session!='undefined' )
 		{
-			$m = new \MongoClient(); // connect
-			$db = $m->selectDB("baztille");
+            global $g_config;
+		    $m = new \MongoClient(); // connect
+		    $db = $m->selectDB( $g_config['db_name'] );
 
 			$this->session = $db->sessions->findOne( array( '_id' => new \MongoId( $session ) ) );
 		}
@@ -67,8 +68,9 @@ class currentUser
 
     public function getAllPlayersInfos()
     {
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
         $session = $this->getdatas();
 
@@ -83,7 +85,7 @@ class currentUser
     	global $g_config;
 
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
 		// Get username
 		$db->users->createIndex( array('username' => 1) );
@@ -128,9 +130,9 @@ class currentUser
 
 	public function logout(  )
 	{    
-		global $g_config;
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
 		$user = $this->app['current_user'];
 
@@ -144,8 +146,9 @@ class currentUser
 	// _ 'member' = identity verified (Baztille real member)
 	public function getUserStatus()
 	{
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
         $session = $this->getdatas();
         	
@@ -161,8 +164,9 @@ class currentUser
 	
 	public function ensure_verified()
 	{
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
 	    $status = $this->getUserStatus();
 
@@ -181,8 +185,10 @@ class currentUser
         $result = $this->getdatas();
         
         // Get ranking
- 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+        global $g_config;
+		$m = new \MongoClient(); // connect
+		$db = $m->selectDB( $g_config['db_name'] );
+
         $user = $db->users->findOne( array( '_id' => new \MongoId( $result['user_id'] ) ) );
         
         $nb_users = $db->users->count();
@@ -220,8 +226,9 @@ class currentUser
     
     public function changeOptin( $email, $value )
     {
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
         if( $email != 'votes' && $email != 'news' ) 
     		throw new \Exception( "Invalid optin value" );
@@ -257,8 +264,9 @@ class currentUser
     
     public function removeAccount()
     {
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
         // Get current user infos
         $currentUser = $this->app['current_user']->getdatas();

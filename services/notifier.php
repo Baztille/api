@@ -43,8 +43,9 @@ class notifier
     
     public function sendEmailToUniqueUser( $user_id, $title, $body )
     {
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
         $userdatas = $db->users->findOne( array( '_id' => new \MongoId( $user_id ) ), array('email', 'username') );
         $this->sendEmail( $userdatas['email'], $title, $body );
@@ -59,8 +60,9 @@ class notifier
     {
         // Send emails to the whole database
 
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
         
         $cursor = $db->users->find( array(), array( 'email', 'username', 'lang', 'optout_votes' ) )->sort( array( 'registration_date' => -1 ) );
         while( $user = $cursor->getNext() )
@@ -147,8 +149,9 @@ class notifier
         if( $question === null )
     		throw new \Exception( "onQuestionSelected: Question empty" );
         
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
 
         // 1°) Notify question author that his question has been selected
@@ -224,8 +227,9 @@ class notifier
         if( $question === null )
     		throw new \Exception( "onQuestionSelected: Question empty" );
         
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 		
 		$bestAnswer = null;
 

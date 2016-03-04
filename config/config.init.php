@@ -51,6 +51,8 @@ $g_config['password_salt'] = 'TO_BE_CHANGED';
 $g_config['jobs_password'] = 'TO_BE_CHANGED';
 
 
+$g_config['db_name'] = 'baztille';
+
 /////////// Question flow ////////////////////
 
 
@@ -93,5 +95,15 @@ $g_config['categories'] = array(
     15 => 'Autres'
 );
 
+
+//// Additional instances
+// (WS servers names => additional configuration file)
+
+$g_config['instances'] = array(
+
+    // Ex :
+    // 'ws.myotherinstance.org' => '/path/to/config/file'
+
+);
 
 

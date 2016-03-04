@@ -37,8 +37,9 @@ class questionFlow
 	{
 		// Select hottest question: Take the one with the most votes
 
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
 		// List questions with status "proposed"
 		// (in case of equality, the most recent win)
@@ -89,9 +90,8 @@ class questionFlow
     private function rejectProposed()
     {
         global $g_config;
-
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
 	    $notifier = $this->app['notifier'];
 
@@ -117,8 +117,9 @@ class questionFlow
 
 	public function closeVote()
 	{
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 		
         // Take only the first one
 	    $question = $db->questions->findOne( array(
@@ -163,8 +164,9 @@ class questionFlow
 	    //   _ best answer
 	    //   _ + answers with more than 50% of votes (TODO)
 
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
 		// Get all "root" args, and order then by votes, down
 		$cursor = $db->args->find( array( 'question' => (string)$question_id, 'parent' => 0 ) );
@@ -196,8 +198,9 @@ class questionFlow
     {
         $html = "<h1>Moderation panel</h1>";
     
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
         if( $question_to_change !== null )
         {

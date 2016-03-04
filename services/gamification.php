@@ -47,8 +47,9 @@ class gamification
     public function onVoteFor( $user_id )
     {
         // +1 point by vote for a contribution
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
         $db->users->update(
           			array( '_id' => new \MongoId( $user_id )),
@@ -64,8 +65,9 @@ class gamification
     public function onUnvoteFor( $user_id )
     {
         // -1 point by vote for a contribution
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
         $db->users->update(
           			array( '_id' => new \MongoId( $user_id )),
@@ -82,8 +84,9 @@ class gamification
     {
         // +3 points if first contribution today
         
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
 		$user = $this->app['current_user'];
         $userdatas = $db->users->findOne( array( '_id' => new \MongoId( $user->id ) ), array('last_contribution') );
@@ -123,8 +126,9 @@ class gamification
     public function onQuestionSelected( $user_id )
     {
         // +100 points
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
         $db->users->update(
           			array( '_id' => new \MongoId( $user_id )),
@@ -140,8 +144,9 @@ class gamification
     public function onAnswerApproved( $user_id )
     {
         // +100 points
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
         $db->users->update(
           			array( '_id' => new \MongoId( $user_id )),

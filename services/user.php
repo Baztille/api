@@ -44,8 +44,9 @@ class user
    	{
 		// Check if there is no existing user with this username/email
 	
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
 		if( $db->users->findOne( array( 'username' => $username ))  !== null )
 			throw new \Exception( "Ce nom d'utilisateur est déjà pris" );
@@ -101,8 +102,9 @@ class user
    	
    	private function sendConfirmationEmailToUser( $id )
    	{
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
         $userdatas = $db->users->findOne( array( '_id' => new \MongoId( $id ) ), array('email', 'username', 'email_verified_code') );
 
@@ -239,8 +241,9 @@ class user
    	
    	public function confirmEmail( $code )
    	{
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
 		$user = $db->users->findOne( array( 'email_verified_code' => $code ));
    	
@@ -257,10 +260,9 @@ class user
    	
    	public function forgetpassword( $email )
    	{
-   	    global $g_config;
-   	
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
 		$user = $db->users->findOne( array( 'email' => $email ));
 		
@@ -307,10 +309,9 @@ class user
     
     public function changepassword( $code, $password )
     {
-   	    global $g_config;
-   	
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
 		$user = $db->users->findOne( array( 'passwordrecovery' => $code ));
 		
@@ -332,8 +333,9 @@ class user
     
     public function sendContactMessage( $text )
     {
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
         // Get current user infos
         $currentUser = $this->app['current_user']->getdatas();

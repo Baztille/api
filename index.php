@@ -37,6 +37,10 @@ require_once __DIR__.'/config/config.init.php';
 require_once __DIR__.'/config/config.php';
 require_once __DIR__.'/config/version.php';
 
+
+if( isset( $_SERVER['SERVER_NAME'] ) && isset( $g_config['instances'][ $_SERVER['SERVER_NAME'] ] ) )
+    require_once $g_config['instances'][ $_SERVER['SERVER_NAME'] ];
+
 // Require Silex
 $loader = require_once $g_config['silex_autoload_location'];
 

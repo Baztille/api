@@ -41,8 +41,9 @@ class wsrequest
         // Add a common part to all Baztille requests
         $data['_bzcom'] = array( );
 
+        global $g_config;
 		$m = new \MongoClient(); // connect
-		$db = $m->selectDB("baztille");
+		$db = $m->selectDB( $g_config['db_name'] );
 
 		$user = $this->app['current_user'];
 		if( $user->is_logged() )
