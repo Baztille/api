@@ -38,8 +38,33 @@ require_once __DIR__.'/config/config.php';
 require_once __DIR__.'/config/version.php';
 
 
-if( isset( $_SERVER['SERVER_NAME'] ) && isset( $g_config['instances'][ $_SERVER['SERVER_NAME'] ] ) )
-    require_once $g_config['instances'][ $_SERVER['SERVER_NAME'] ];
+if( isset( $_SERVER['SERVER_NAME'] ) )
+{
+    if( isset( $g_config['instances'][ $_SERVER['SERVER_NAME'] ] ) )
+        require_once $g_config['instances'][ $_SERVER['SERVER_NAME'] ];
+}
+else if( isset( $_SERVER['argv'] ) )
+{
+    // This is a job => MUST specify an instance name or "default"
+    $options = getopt( 'p:j:i:' );
+    
+    $instance = $options['i'];
+    
+    if( $instance == 'default' )
+    {
+        // Do nothing
+    }
+    else if( isset( $g_config['instances'][ $instance ] ) )
+    {
+        require_once $g_config['instances'][ $instance ];
+    }
+    else
+    {
+        die('Error, incorrect instance specified for cronjob : '.$instance );    
+    }    
+}
+
+
 
 // Require Silex
 $loader = require_once $g_config['silex_autoload_location'];
