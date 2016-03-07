@@ -422,9 +422,9 @@ class question
 		// TODO: add a question submission limit (ex: maximum of 1 question per day per user)
 		
 		// Perform checks (ex: length)
-		if( strlen( $text ) < 10 )
+		if( mb_strlen($text, 'UTF-8') < 10 )
 		    throw new \Exception( "Votre question doit au moins faire 10 caractères." );
-		if( strlen( $text ) > 200 )
+		if( mb_strlen($text, 'UTF-8') > 200 )
 		    throw new \Exception( "Votre question est trop longue." );
 		
 		$timestamp = time();
@@ -511,9 +511,9 @@ class question
 		// Perform checks (ex: length)
 		//   check the answer does not exists already TODO
 		//   check users limits
-		if( strlen( $text ) < 10 )
+		if( mb_strlen($text, 'UTF-8') < 10 )
 		    throw new \Exception( "Votre contribution doit au moins faire 10 caractères." );
-		if( strlen( $text ) > 200 )
+		if( mb_strlen($text, 'UTF-8') > 200 )
 		    throw new \Exception( "Votre contribution est trop longue." );
         
         // I can do an immediate update in the following case:
@@ -590,9 +590,9 @@ class question
 		// Perform checks (ex: length)
 		//   check the answer does not exists already TODO
 		//   check users limits
-		if( strlen( $text ) < 10 )
+		if( mb_strlen($text, 'UTF-8') < 10 )
 		    throw new \Exception( "Votre contribution doit au moins faire 10 caractères." );
-		if( strlen( $text ) > 200 )
+		if( mb_strlen($text, 'UTF-8') > 200 )
 		    throw new \Exception( "Votre contribution est trop longue." );
 
 		$question = $db->questions->findOne( array( '_id' => new \MongoId( $id )) );    
