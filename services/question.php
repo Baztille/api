@@ -86,7 +86,7 @@ class question
         
         if( $sorting == UX_QUESTION_SORTING_HOTTEST )
         {
-            $two_hours_ahead = time() + ( 2*3600 );
+            $two_hours_ahead = time() + ( 12*3600 ); // Now it is 12 hours (2 hours was way too sensible)
 
 		    $questions_ordered = $db->questions->aggregate( 
 		        array( 
@@ -265,20 +265,38 @@ class question
 
             if( $sorting == UX_QUESTION_SORTING_HOTTEST )
             {
-                $two_hours_ahead = time() + ( 2*3600 );
+                $two_hours_ahead = time() + ( 12*3600 ); // Now it is 12 hours (2 hours was way too sensible)
+                
+                $argument_date = '$date';
+                
+                if( isset( $res['date_vote'] ) )
+                {
+                    // This question has been proposed to vote (= selected)
+                    // => at the time the question is proposed to vote, we reset all the contribution date to the time the vote has been opened
+                    // (ex : a question has been posted on Jan 23th. The question is selected on Jan 29th. Even if the question is 6 days old, it is considered that it has been posted on Jan 29th).
+                    //    
+                    
+                    $argument_date = array(
+                        '$cond' => array(
+                            array( '$gte' => array( '$date', $res['date_vote'] ) ),
+                            '$date',
+                            $res['date_vote']
+                        )
+                    );
+                }
 
 		        $args_ordered = $db->args->aggregate( 
 		            array( 
 		            
 		                    array( '$match' => array( 'question' => $id ) ),
-		                    array( '$project' => array( 
+		                    array(  '$project' => array( 
                                                   'score' => array( 
                                                         '$divide' => array( 
                                                              array(
                                                                 '$subtract' => array( '$vote', 0 )    // Divide number of votes minus one (don't take into account first voter)
                                                              ),
                                                              array( 
-                                                                '$subtract' => array( $two_hours_ahead, '$date' ) // By time since proposed, +2 hours
+                                                                '$subtract' => array( $two_hours_ahead, $argument_date ) // By time since proposed, +2 hours
                                                              ) )
                                                    )
                                               )
@@ -287,7 +305,7 @@ class question
                             
                          )
                     );       
-
+                    
 
                 // Make sure the most voted arg is always first, anytime
                 $cursor = $db->args->find( array( 'question' => $id ), array( 'vote' => 1, 'date' => 1 ) )->sort( array( 'vote' => -1, 'date' => -1 ) );
