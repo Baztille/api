@@ -159,7 +159,7 @@ class notifier
         $title = "Félicitations : votre question a été sélectionnée !";
         $body = "<h1 class=\"baz_toptitle\" style=\"font-weight:400;\">Bravo !</h1><br>La question que vous avez proposée (<i>\"".$question['text']."\"</i>) a été celle jugée la plus intéressante par la communauté Baztille et vient d'être proposée au vote.";
         //$body .= "\n\n";
-        $body .= "<br><a href=\"".$g_config['app_base_url'].'/#/question/questions/'.( (string)$question['_id'] )."\" class=\"btn-primary\" style=\"background-color: #00A8D0; border-radius:5px; color: #fff; position: relative; display: inline-block;margin: 0;padding: 0 12px; min-width: 52px; min-height: 33px; vertical-align: top; text-align: center; text-overflow: ellipsis; font-size: 14px; line-height: 32px; margin-top:20px; margin-bottom:20px;\">Voir la question</a>";
+        $body .= "<br><a href=\"".$g_config['app_base_url'].'/question/questions/'.( (string)$question['_id'] )."\" class=\"btn-primary\" style=\"background-color: #00A8D0; border-radius:5px; color: #fff; position: relative; display: inline-block;margin: 0;padding: 0 12px; min-width: 52px; min-height: 33px; vertical-align: top; text-align: center; text-overflow: ellipsis; font-size: 14px; line-height: 32px; margin-top:20px; margin-bottom:20px;\">Voir la question</a>";
         $body .= "<br>... et vous avez gagné 100 points Baztille !";
 
         $this->sendEmailToUniqueUser( $question['author'], $title, $body );
@@ -173,11 +173,11 @@ class notifier
         
         $body = "<h1 class=\"baz_toptitle\" style=\"font-weight:400;\">C'est le moment de voter !</h1><br>La question suivante est en débat pour une durée de ".$g_config['current_question_vote_delay']." jours.";
         $body .= "<br><br><b>".$question['text']."</b>";
-        $body .= "<br><a href=\"".$g_config['app_base_url'].'/#/question/questions/'.( (string)$question['_id'] )."\" class=\"btn-primary\" style=\"background-color: #00A8D0; border-radius:5px; color: #fff; position: relative; display: inline-block;margin: 0;padding: 0 12px; min-width: 52px; min-height: 33px; vertical-align: top; text-align: center; text-overflow: ellipsis; font-size: 14px; line-height: 32px; margin-top:20px; margin-bottom:20px;\">Votez</a>";
+        $body .= "<br><a href=\"".$g_config['app_base_url'].'/question/questions/'.( (string)$question['_id'] )."\" class=\"btn-primary\" style=\"background-color: #00A8D0; border-radius:5px; color: #fff; position: relative; display: inline-block;margin: 0;padding: 0 12px; min-width: 52px; min-height: 33px; vertical-align: top; text-align: center; text-overflow: ellipsis; font-size: 14px; line-height: 32px; margin-top:20px; margin-bottom:20px;\">Votez</a>";
         
         //$body .= "<h2>Proposez la prochaine question</h2>";
         $body .= "<br><br>Vous pouvez aussi proposer et choisir la question qui sera posée la semaine prochaine.";
-        $body .= "<br><a href=\"".$g_config['app_base_url']."/#/question/proposed\" class=\"btn-secondary\" style=\"color: #000; position: relative; display: inline-block; vertical-align: top; text-align: center; text-overflow: ellipsis; margin-top:10px; margin-bottom:10px; text-decoration:underline;\">Proposez une question</a>";
+        $body .= "<br><a href=\"".$g_config['app_base_url']."/question/proposed\" class=\"btn-secondary\" style=\"color: #000; position: relative; display: inline-block; vertical-align: top; text-align: center; text-overflow: ellipsis; margin-top:10px; margin-bottom:10px; text-decoration:underline;\">Proposez une question</a>";
                 
         // Last decisions
         
@@ -202,7 +202,7 @@ class notifier
             if( $n>2 )
                 break;
         }     
-        $body .= "<br><a href=\"".$g_config['app_base_url']."/#/question/voted\" class=\"btn-secondary\"  style=\"color: #000; position: relative; display: inline-block; vertical-align: top; text-align: center; text-overflow: ellipsis; margin-top:10px; margin-bottom:10px; text-decoration:underline;\">Tous les résultats</a> ";
+        $body .= "<br><a href=\"".$g_config['app_base_url']."/question/voted\" class=\"btn-secondary\"  style=\"color: #000; position: relative; display: inline-block; vertical-align: top; text-align: center; text-overflow: ellipsis; margin-top:10px; margin-bottom:10px; text-decoration:underline;\">Tous les résultats</a> ";
 
         $this->sendEmailToAllUsers( $subject, $body );
     }
@@ -243,7 +243,7 @@ class notifier
                 $title = "Félicitations : votre réponse a été approuvée !";
                 $body = "<h1 class=\"baz_toptitle\" style=\"font-weight:400;\">Bravo !</h1><br>la réponse que vous avez proposée (\"<i>".$answer['text']."</i>\") pour la question \"<i>".$question['text']."</i>\" a été approuvée par la communauté Baztille.";
 
-                $body .= "<br><a href=\"".$g_config['app_base_url'].'/#/question/questions/'.( (string)$question['_id'] )."\" class=\"btn-primary\" style=\"background-color: #00A8D0; border-radius:5px; color: #fff; position: relative; display: inline-block;margin: 0;padding: 0 12px; min-width: 52px; min-height: 33px; vertical-align: top; text-align: center; text-overflow: ellipsis; font-size: 14px; line-height: 32px; margin-top:20px; margin-bottom:20px;\">Voir la question</a>";
+                $body .= "<br><a href=\"".$g_config['app_base_url'].'/question/questions/'.( (string)$question['_id'] )."\" class=\"btn-primary\" style=\"background-color: #00A8D0; border-radius:5px; color: #fff; position: relative; display: inline-block;margin: 0;padding: 0 12px; min-width: 52px; min-height: 33px; vertical-align: top; text-align: center; text-overflow: ellipsis; font-size: 14px; line-height: 32px; margin-top:20px; margin-bottom:20px;\">Voir la question</a>";
                 $body .= "<br>... et vous avez gagné 100 points Baztille !";
 
                 $this->sendEmailToUniqueUser( $answer['author'], $title, $body );
@@ -269,7 +269,7 @@ class notifier
         $body .= "<br><br>";
 
         $body .= "Il vous reste encore 24h pour décider de la prochaine question qui sera posée à la communauté :";
-        $body .= "<br><a href=\"".$g_config['app_base_url']."/#/question/proposed\" class=\"btn-primary\" style=\"background-color: #00A8D0; border-radius:5px; color: #fff; position: relative; display: inline-block;margin: 0;padding: 0 12px; min-width: 52px; min-height: 33px; vertical-align: top; text-align: center; text-overflow: ellipsis; font-size: 14px; line-height: 32px; margin-top:20px; margin-bottom:20px;\">Voir les questions</a>";
+        $body .= "<br><a href=\"".$g_config['app_base_url']."/question/proposed\" class=\"btn-primary\" style=\"background-color: #00A8D0; border-radius:5px; color: #fff; position: relative; display: inline-block;margin: 0;padding: 0 12px; min-width: 52px; min-height: 33px; vertical-align: top; text-align: center; text-overflow: ellipsis; font-size: 14px; line-height: 32px; margin-top:20px; margin-bottom:20px;\">Voir les questions</a>";
 
         // Last decisions
         
@@ -295,7 +295,7 @@ class notifier
             if( $n>2 )
                 break;
         }   
-        $body .= "<br><a href=\"".$g_config['app_base_url']."/#/question/voted\" class=\"btn-secondary\"  style=\"color: #000; position: relative; display: inline-block; vertical-align: top; text-align: center; text-overflow: ellipsis; margin-top:10px; margin-bottom:10px; text-decoration:underline;\">Tous les résultats</a> ";
+        $body .= "<br><a href=\"".$g_config['app_base_url']."/question/voted\" class=\"btn-secondary\"  style=\"color: #000; position: relative; display: inline-block; vertical-align: top; text-align: center; text-overflow: ellipsis; margin-top:10px; margin-bottom:10px; text-decoration:underline;\">Tous les résultats</a> ";
         
         $this->sendEmailToAllUsers( $subject, $body );
     }
@@ -322,7 +322,7 @@ class notifier
 
 
         $url_accept = $g_config['app_webservice_url'].'/admin/moderationpanel?key='.$g_config['moderation_password'].'&id='.$to_moderate['_id'].'&accept=1';
-        $url_refuse = 'http://ws.far.baztille.org/admin/moderationpanel?key=12345&id='.$to_moderate['_id'].'&accept=0';
+        $url_refuse = $g_config['app_webservice_url'].'/admin/moderationpanel?key='.$g_config['moderation_password'].'&id='.$to_moderate['_id'].'&accept=0';
 
         $body .= "To accept : ".$url_accept."\n\n";
         $body .= "To refuse : ".$url_refuse."\n\n";

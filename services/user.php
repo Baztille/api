@@ -276,7 +276,7 @@ class user
 	          			array('$set' => array("passwordrecovery" => $randomCode ))
 	          			);
 
-        $url = $g_config['app_base_url']. "/#/newpassword/".$randomCode;
+        $url = $g_config['app_base_url']. "/newpassword/".$randomCode;
 
         // Send email
         
