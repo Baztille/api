@@ -351,9 +351,9 @@ class user
         $title = "Nouveau message depuis le formulaire de contact";
         
         $body = "Message envoyé par $username ($email).";
-        $body .= "\n\n";
+        $body .= "<br><br>";
         $body .= $text;
-        $body .= "\n\n";
+        $body .= "<br><br>";
 
 	    $notifier = $this->app['notifier'];
         $notifier->sendEmailToAdmin( $title, $body, $email  );      
