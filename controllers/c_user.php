@@ -29,9 +29,9 @@ $c_user = $app['controllers_factory'];
 
 $c_user->post( '/signin', function( Request $request ) use ($app) {
 
-    $username = $request->get('username');
+    $username = trim($request->get('username'));
     $password = $request->get('password');
-    $email = $request->get('email');
+    $email = trim($request->get('email'));
 	// TODO: check argument validity
 
 	$auth_token = $app['user']->createUser( $username, $password, $email );
