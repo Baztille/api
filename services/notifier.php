@@ -268,6 +268,11 @@ class notifier
         }
         $body .= "<br><br>";
 
+        $body .= "Cette réponse sera celle défendue par les élus du mouvement Baztille ... à moins que vous n'en décidiez autrement une prochaine fois !";
+
+
+        $body .= "<br><br>";
+
         $body .= "Il vous reste encore 24h pour décider de la prochaine question qui sera posée à la communauté :";
         $body .= "<br><a href=\"".$g_config['app_base_url']."/question/proposed\" class=\"btn-primary\" style=\"background-color: #00A8D0; border-radius:5px; color: #fff; position: relative; display: inline-block;margin: 0;padding: 0 12px; min-width: 52px; min-height: 33px; vertical-align: top; text-align: center; text-overflow: ellipsis; font-size: 14px; line-height: 32px; margin-top:20px; margin-bottom:20px;\">Voir les questions</a>";
 
