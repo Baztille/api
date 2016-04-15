@@ -48,7 +48,22 @@ class wsrequest
 		$user = $this->app['current_user'];
 		if( $user->is_logged() )
 		{
-            $userdatas = $db->users->findOne( array( '_id' => new \MongoId( $user->id ) ), array('points', 'pointsdetails') );
+            $userdatas = $db->users->findOne( array( '_id' => new \MongoId( $user->id ) ), array('points', 'pointsdetails', 'last_session') );
+            
+            // Set new last_session all 30min
+            $timestampLast = (isset($userdatas['last_session'])) ? $userdatas['last_session'] : 0 ;
+            $timestamp = time();
+
+            if($timestamp - $timestampLast > (1 * 1 * 30 * 60)) {
+               
+                $db->users->update( 
+                    array( '_id' => new \MongoId( $user->id )),
+                    array('$set' => array("last_session" => $timestamp ))
+                );
+            }
+
+            
+
             $data['_bzcom']['user'] = $userdatas;
         }
     
