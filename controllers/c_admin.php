@@ -61,5 +61,20 @@ $c_admin->get( '/moderationpanel', function( Request $request ) use ($app) {
     return $app['questionFlow']->getModerationPanel( $id, $bAccept );
 } );
 
+$c_admin->post( '/updatetopic', function( Request $request ) use ($app) {
+
+    global $g_config;
+
+    if( $request->get('key') != $g_config['apiKey'] )
+        die(':(');
+    
+    $question_id = $request->get('id');
+    $topics = $request->get('topics');
+    $question_id = $app['question']->updateQuestionTopics( $question_id, $topics );
+    
+    return $app->json( $app['wsrequest']->buildWsResponse( array( 'id' => $question_id) ), 201, array('Access-Control-Allow-Origin' => '*','Access-Control-Allow-Headers'=>'Content-Type', 'Content-Type' => 'application/json') );
+
+} );
+
 
 return $c_admin;

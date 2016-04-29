@@ -592,6 +592,33 @@ class question
             return 0;
         }
     }
+
+    public function updateQuestionTopics( $question_id, $topics )
+    {
+
+        global $g_config;
+		$m = new \MongoClient(); // connect
+		$db = $m->selectDB( $g_config['db_name'] );
+
+        // Get the current question
+		$question = $db->questions->findOne( array( '_id' => new \MongoId( $question_id )) );    
+		
+		if( $question===null )
+			return "Question not found";
+
+        // We can only modify question that has not been voted yet
+		if( isset($question['topics']) )
+			return "topics deja saisie";
+
+		// Save the previous text in "history" field
+      		$db->questions->update( 
+      			array( '_id' => new \MongoId( $question_id )),
+      			    array( '$set' => array("topics" => $topics) )
+      			);
+      			
+            return $question_id;
+
+    }
 	
 	public function postArg( $id, $text, $parent )
 	{

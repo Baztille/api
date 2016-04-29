@@ -68,7 +68,7 @@ $g_config['proposed_questions_selection_max_attempts'] = 4;
 $g_config['send_real_emails'] = true;
 
 
-
+$g_config['apiKey'] = '<YOURAPIKEY>';
 $g_config['moderation_password'] = '12345';
 
 $g_config['moderators_emails'] = array();
