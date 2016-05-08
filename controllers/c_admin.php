@@ -76,5 +76,15 @@ $c_admin->post( '/updatetopic', function( Request $request ) use ($app) {
 
 } );
 
+$c_admin->post( '/report', function (Request $request) use($app) {
+
+    $question_id = $request->get('question_id');
+    $arg_id = $request->get('arg_id');
+    $level = $request->get('level');
+    $result = $app['question']->saveSignalement( $question_id, $arg_id, $level );
+    
+    return $app->json( $app['wsrequest']->buildWsResponse( array( 'result' => $result) ), 201, array('Access-Control-Allow-Origin' => '*','Access-Control-Allow-Headers'=>'Content-Type', 'Content-Type' => 'application/json') );
+} );
+
 
 return $c_admin;

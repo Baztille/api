@@ -619,6 +619,61 @@ class question
             return $question_id;
 
     }
+
+    public function saveSignalement( $question_id, $arg_id, $level )
+    {
+
+        global $g_config;
+		$m = new \MongoClient(); // connect
+		$db = $m->selectDB( $g_config['db_name'] );
+
+		$user = $this->app['current_user'];
+		$user->ensure_logged();
+        $user->ensure_verified();
+
+
+		if( $question_id ) {
+			// Get the current question
+			$question = $db->questions->findOne( array( '_id' => new \MongoId( $question_id )) );    
+		
+			if( $question===null ) {
+				return "Question not found";
+			} else {
+				$type = "question";
+			}	
+		}
+
+        if( $arg_id ) {
+			// Get the current question
+			$arg = $db->args->findOne( array( '_id' => new \MongoId( $arg_id )) );    
+		
+			if( $arg===null ) {
+				return "Arg not found";
+			} else {
+				$type = "arg";
+			}
+		}
+
+		$timestamp = time();
+
+        // Insert new arg
+		$report = array(
+		    'type' => $type,
+		    'arg' => $arg_id,
+	        'question' => $question_id,
+	        'date' => $timestamp,
+		    'author' => $user->id,
+		    'level' => $level
+			);
+			
+		$res = $db->reports->insert( $report ); 
+
+		if( $res )
+		{
+			return true;
+		}
+
+    }
 	
 	public function postArg( $id, $text, $parent )
 	{
