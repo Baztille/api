@@ -232,7 +232,8 @@ class user
             'veryrealemail.com','webm4il.info','wegwerfemail.de',
             'wh4f.org','whyspam.me','willselfdestruct.com',
             'wuzupmail.net','yopmail.com','yuurok.com',
-            'zehnminutenmail.de','zippymail.info','zoaxe.com'        
+            'zehnminutenmail.de','zippymail.info','zoaxe.com',
+            'superrito.com'   
         ) ) )
             return false;
         else
