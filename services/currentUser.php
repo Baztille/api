@@ -80,6 +80,103 @@ class currentUser
         return $user;
     }
 
+    public function getUserContent($type)
+    {
+
+        global $g_config;
+        $m = new \MongoClient();
+        $db = $m->selectDB( $g_config['db_name'] );
+
+        $session = $this->getdatas();
+
+        // Retreive ranking position
+
+        $user = $db->users->findOne( array( '_id' => new \MongoId( $session['user_id'] ) ) , array(
+            'username'=>true,'email'=>true,'lang'=>true,'registration_date'=>true,'verified'=>true,'email_verified'=>true,'points'=>true) );
+        $nb_users = $db->users->count();
+        $better_users = $db->users->find( array( 'points' => array( '$gt' => $user['points'] ) ) );
+        $user['rank'] = $better_users->count()+1;
+        $user['nb_users'] = $nb_users;
+
+        // Retrieve user questions
+
+        if($type == "contents") {
+
+            $cursor = $db->questions->find( array( 'author' => $session['user_id'] ) , array() )->sort( array( 'date_proposed' => -1 ) );
+            $session['questions'] = array();
+            
+            while( $question = $cursor->getNext() )
+            {
+                $argcursor = $db->args->find( array( 'question' => (string)$question['_id'], 'parent' => 0 ) );
+                $question['nbReponse'] = $argcursor->count();
+                $session['questions'][] = $question;
+            }   
+
+            // Get user's votes
+
+            $session['myvotes'] = array();
+            $db->questionvotes->createIndex( array( 'user' => 1 ) );
+            $cursorV = $db->questionvotes->find( array( 'user' => $session['user_id'] ) );
+
+            while( $myvote = $cursorV->getNext() )
+            {
+                $session['myvotes'][ $myvote['question'] ] = 1;
+            }
+
+        }  
+        
+        // Retrieve user answers
+
+        else if($type == "args") {
+
+            $cursor = $db->args->find( array( 'author' => $session['user_id'] ) , array() )->sort( array( 'date_proposed' => 1 ) );
+            $session['args'] = array();
+
+            while( $arg = $cursor->getNext() )
+            {
+                $argcursor = $db->args->find( array( 'question' => (string)$arg['question'], 'parent' => (string)$arg['_id'] ) );
+                $arg['nbReponse'] = $argcursor->count();
+                $session['args'][] = $arg;
+            } 
+
+            // Get user's votes
+            
+            $session['myvotes'] = array();
+            $db->votes->createIndex( array( 'user' => 1 ) );
+            $cursorV = $db->votes->find( array( 'user' => $session['user_id'] ) );
+
+            while( $myvote = $cursorV->getNext() )
+            {
+                $session['myvotes'][ $myvote['arg'] ] = 1;
+            }  
+        
+        }
+
+        // TODO
+
+        else if($type == "votes") {
+
+            $cursor = $db->votes->find( array( 'user' => $session['user_id'] ) , array() )->sort( array( 'time' => 1 ) );
+            $session['votes'] = array();
+
+            while( $vote = $cursor->getNext() )
+            {
+                $session['votes'][ (string) $vote['_id'] ] = $vote;
+            }   
+
+            $cursor = $db->questionvotes->find( array( 'user' => $session['user_id'] ) , array() )->sort( array( 'time' => 1 ) );
+            $session['questionvotes'] = array();
+
+            while( $questionvote = $cursor->getNext() )
+            {
+                $session['questionvotes'][ (string) $questionvote['_id'] ] = $questionvote;
+            }   
+            
+        }    
+
+        return array_merge($session, $user);
+    }
+
 	public function login( $username, $password )
 	{    
     	global $g_config;
@@ -216,6 +313,7 @@ class currentUser
 	        if( $rank > 20 )
 	            break;
         }
+
         return $result;    
     }
     

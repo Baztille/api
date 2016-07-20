@@ -84,5 +84,12 @@ $c_session->post( '/removeAccount', function( Request $request ) use ($app) {
 	return $app->json( $app['wsrequest']->buildWsResponse( array( 'ok' => 1 ) ), 201, array('Access-Control-Allow-Origin' => '*', 'Access-Control-Allow-Headers'=>'Content-Type','Content-Type' => 'application/json') );
 } );
 
+$c_session->get( '/my/{type}', function($type, Request $request ) use ($app) {
+
+	$user = $app['current_user'];
+	
+	return $app->json( $app['wsrequest']->buildWsResponse( $user->getUserContent( $type ) ), 201, array('Access-Control-Allow-Origin' => '*', 'Access-Control-Allow-Headers'=>'Content-Type','Content-Type' => 'application/json') );
+} );
+
 
 return $c_session;
