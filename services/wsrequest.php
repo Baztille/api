@@ -55,12 +55,14 @@ class wsrequest
             $timestampCurrent = (isset($userdatas['current_session'])) ? $userdatas['current_session'] : 0 ;
             $timestamp = time();
 
-            if($timestampCurrent - $timestampLast > (1 * 10 * 60 * 60)) { 
+            if($timestamp - $timestampLast > (1 * 10 * 60 * 60)) { 
                
                 $db->users->update( 
                     array( '_id' => new \MongoId( $user->id )),
                     array('$set' => array("last_session" => $timestampCurrent , "current_session" => $timestamp))
                 );
+
+                $userdatas = $db->users->findOne( array( '_id' => new \MongoId( $user->id ) ), array('points', 'pointsdetails', 'last_session', 'current_session') );
 
             } else { 
 
