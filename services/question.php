@@ -79,11 +79,17 @@ class question
 			    $sorting = UX_QUESTION_SORTING_VOTED;
         }
         
-        if( $category == UX_QUESTION_CATEGORY_ALL )
-            $matching =  array( 'status' => $status );
-        else
-            $matching = array( 'status' => $status, 'category' => intval($category) );
-        
+        if( $category == UX_QUESTION_CATEGORY_ALL ) {
+        	$matching =  array( 'status' => $status );
+        } 
+        else {
+        	if( is_numeric($category) ) {
+        		$matching = array( 'status' => $status, 'category' => intval($category) );
+        	} else {
+        		$matching = array( 'status' => $status, 'topics' => (string)$category );
+        	}
+        }            
+
         if( $sorting == UX_QUESTION_SORTING_HOTTEST )
         {
             $two_hours_ahead = time() + ( 12*3600 ); // Now it is 12 hours (2 hours was way too sensible)
@@ -606,11 +612,9 @@ class question
 		if( $question===null )
 			return "Question not found";
 
-        // We can only modify question that has not been voted yet
 		if( isset($question['topics']) )
 			return "topics deja saisie";
 
-		// Save the previous text in "history" field
       		$db->questions->update( 
       			array( '_id' => new \MongoId( $question_id )),
       			    array( '$set' => array("topics" => $topics) )
@@ -630,7 +634,6 @@ class question
 		$user = $this->app['current_user'];
 		$user->ensure_logged();
         $user->ensure_verified();
-
 
 		if( $question_id ) {
 			// Get the current question
