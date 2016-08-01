@@ -101,6 +101,15 @@ $c_question->post( '/updateQuestion', function (Request $request) use($app) {
 	return $app->json( $app['wsrequest']->buildWsResponse( array( 'id' => $question_id) ), 201, array('Access-Control-Allow-Origin' => '*','Access-Control-Allow-Headers'=>'Content-Type', 'Content-Type' => 'application/json') );
 } );
 
+$c_question->post( '/updateArg', function (Request $request) use($app) {
+
+    $arg_id = $request->get('parent');
+    $text = $request->get('text');
+    $arg_id = $app['question']->updateArg( $arg_id, $text);
+    
+    return $app->json( $app['wsrequest']->buildWsResponse( array( 'id' => $arg_id) ), 201, array('Access-Control-Allow-Origin' => '*','Access-Control-Allow-Headers'=>'Content-Type', 'Content-Type' => 'application/json') );
+} );
+
 
 $c_question->post( '/{id}/postarg', function( $id, Request $request ) use ($app) {
 

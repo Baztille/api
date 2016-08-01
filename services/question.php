@@ -773,6 +773,96 @@ class question
 			throw new \Exception( "Error during argument insertion" );
 		}	
 	}
+
+	public function updateArg( $arg_id, $text )
+    {
+		$user = $this->app['current_user'];
+		$user->ensure_logged();
+        $user->ensure_verified();
+
+        global $g_config;
+		$m = new \MongoClient(); // connect
+		$db = $m->selectDB( $g_config['db_name'] );
+
+        $user_id = $user->id;
+
+        // Get the current question
+		$arg = $db->args->findOne( array( '_id' => new \MongoId( $arg_id )) );    
+		//return $arg; exit;
+		if( $arg===null )
+			return "Argument not found";
+
+		$question = $db->questions->findOne( array( '_id' => new \MongoId( $arg['question'] )) );  
+
+        // We can only modify question that has not been voted yet
+		if( $question['status'] != 'proposed' && $question['status'] != 'vote' )
+			return "Le débat sur cette question est maintenant terminé";
+
+		// Perform checks (ex: length)
+		//   check the answer does not exists already TODO
+		//   check users limits
+		if( mb_strlen($text, 'UTF-8') < 10 )
+		    throw new \Exception( "Votre contribution doit au moins faire 10 caractères." );
+		if( mb_strlen($text, 'UTF-8') > 200 )
+		    throw new \Exception( "Votre contribution est trop longue." );
+        
+        // I can do an immediate update in the following case:
+        //  1. I am the author   
+        //  2. Nobody except me has voted for this argument
+
+        $bImmediateModif = false;
+        if( $arg['author'] == (string)$user_id )
+        {
+            // Who votes for this question ???
+            $count_votes = $db->votes->find( array( 'arg' => $arg_id, 'user' => array( '$ne' => $user_id ) ), array( 'user' ) )->count();
+
+            if( $count_votes == 0 )
+            {
+                $bImmediateModif = true;
+            }
+        }
+        
+        if( $bImmediateModif )
+        {
+            // Save the previous text in "history" field
+            $db->args->update(
+      			array( '_id' => new \MongoId( $arg_id )),
+      			array(
+      			    '$push' => array( 'history' => array( 'text' => $arg['text'], 'removed_time'=>time() ) )
+      			)            
+            );
+
+      		$db->args->update( 
+      			array( '_id' => new \MongoId( $arg_id )),
+      			    array( '$set' => array("text" => $text) )
+      			);
+      			
+            return $arg_id;
+        }
+        else
+        {
+            $to_moderate = array(
+                    'question_id' => $arg['parent'],
+                    'arg_id' => $arg_id,
+                    'author' => $user_id,
+                    'before' => $arg['text'],
+                    'after' => $text,
+                    'date' => time()
+                );
+        
+            // Add this update to the moderators panel
+            $res = $db->questionUpdateRequests->insert(
+                $to_moderate
+            );
+            
+            // Notify admins that there is a new string to moderate.
+	        $notifier = $this->app['notifier'];
+            $notifier->onQuestionToModerate( $to_moderate );
+            
+        
+            return 0;
+        }
+    }
     
     public function voteForQuestion( $id )
 	{
