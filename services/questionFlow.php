@@ -194,79 +194,266 @@ class questionFlow
         $notifier->sendEmailToUniqueUser( '5614c5f2ce4248861c8b4567', 'test sub', 'test content' );
     }
 
-    function getModerationPanel( $question_to_change=null, $bAccept=null )
+    public function getInfoReport($item) {
+    	switch ($item) {
+    		case '1':
+    			$out="Proposition diffamatoire et insultante, Ceci n'a rien à faire sur Baztille";
+    			break;
+    		case '2':
+    			$out="Proposition sans intérêt, Cela n'apporte rien au débat";
+    			break;
+    		case '3':
+    			$out="Spam, Promotion abusive d'une idée ou d'un lien";
+    			break;
+    		case '4':
+    			$out="Doublon";
+    			break;
+    		case '5':
+    			$out="Très mauvaise rédaction, La proposition est incompréhensible";
+    			break;
+    		
+    	}
+    	return $out;
+    }
+
+    public function getModerationPanel( $object_to_change=null, $bAccept=null, $type=null )
     {
-        $html = "<h1>Moderation panel</h1>";
-    
+
         global $g_config;
 		$m = new \MongoClient(); // connect
 		$db = $m->selectDB( $g_config['db_name'] );
 
-        if( $question_to_change !== null )
+        if( $object_to_change !== null )
         {
-            $change = $db->questionUpdateRequests->findOne( array( '_id' => new \MongoId((string)$question_to_change) ) ) ;
+            $change = $db->questionUpdateRequests->findOne( array( '_id' => new \MongoId((string)$object_to_change) ) ) ;
 
-            if( $change !== null )
-            {
-                if( $bAccept )
-                {
-                   $question_id = $change['question_id'];
-		           $question = $db->questions->findOne( array( '_id' => new \MongoId( $question_id )) );    
-		
-		           if( $question!==null )
-                   {
-                        // Save the previous text in "history" field
-                        $db->questions->update(
-                  			array( '_id' => new \MongoId( $question_id )),
-                  			array(
-                  			    '$push' => array( 'history' => array( 'text' => $question['text'], 'removed_time'=>time() ) )
-                  			)            
-                        );
+            if( $type == "question") {
 
-                        // Replace the question
-                  		$db->questions->update( 
-                  			array( '_id' => new \MongoId( $question_id )),
-                  			    array( '$set' => array( "text" => $change['after'], "category" => $change['after_category'] ) ) 
-                  			);
+	            if( $change !== null )
+	            {
+	                if( $bAccept )
+	                {
+	                   $question_id = $change['question_id'];
+			           $question = $db->questions->findOne( array( '_id' => new \MongoId( $question_id )) );    
+			
+			           if( $question!==null )
+	                   {
+	                        // Save the previous text in "history" field
+	                        $db->questions->update(
+	                  			array( '_id' => new \MongoId( $question_id )),
+	                  			array(
+	                  			    '$push' => array( 'history' => array( 'text' => $question['text'], 'removed_time'=>time() ) )
+	                  			)            
+	                        );
 
-                        // Remove this entry
-                        $db->questionUpdateRequests->remove( array( '_id' => new \MongoId((string)$question_to_change) ) );
+	                        // Replace the question
+	                  		$db->questions->update( 
+	                  			array( '_id' => new \MongoId( $question_id )),
+	                  			    array( '$set' => array( "text" => $change['after'], "category" => $change['after_category'] ) ) 
+	                  			);
 
-                   }
+	                        // Update this entry to accepted
+	                        $db->questionUpdateRequests->update( 
+	                  			array( '_id' => new \MongoId((string)$object_to_change) ),
+	                  			    array( '$set' => array( "status" => 'accepted') ) 
+	                  			);
 
-                }
-                else
-                {
-                    // Remove this entry
-                    $db->questionUpdateRequests->remove( array( '_id' => new \MongoId((string)$question_to_change) ) );
-                }
+	                   }
+
+	                }
+	                else
+	                {
+	                    // Update this entry to rejected
+	                    $db->questionUpdateRequests->update( 
+	                  			array( '_id' => new \MongoId((string)$object_to_change) ),
+	                  			    array( '$set' => array( "status" => 'rejected') ) 
+	                  			);
+	                }
+	            }
+
             }
-        }
 
-        global $g_config;
-        $cursor = $db->questionUpdateRequests->find();
+            if( $type == "argument") {
+
+	            if( $change !== null )
+	            {
+	                if( $bAccept )
+	                {
+	                   $arg_id = $change['arg_id'];
+			           $arg = $db->args->findOne( array( '_id' => new \MongoId( $arg_id )) );    
+			
+			           if( $arg!==null )
+	                   {
+	                        // Save the previous text in "history" field
+	                        $db->args->update(
+	                  			array( '_id' => new \MongoId( $arg_id )),
+	                  			array(
+	                  			    '$push' => array( 'history' => array( 'text' => $arg['text'], 'removed_time'=>time() ) )
+	                  			)            
+	                        );
+
+	                        // Replace the question
+	                  		$db->args->update( 
+	                  			array( '_id' => new \MongoId( $arg_id )),
+	                  			    array( '$set' => array( "text" => $change['after']) ) 
+	                  			);
+
+	                        // Update this entry to accepted
+	                        $db->questionUpdateRequests->update( 
+	                  			array( '_id' => new \MongoId((string)$object_to_change) ),
+	                  			    array( '$set' => array( "status" => 'accepted') ) 
+	                  			);
+
+	                   }
+
+	                }
+	                else
+	                {
+	                    // Update this entry to rejected
+	                    $db->questionUpdateRequests->update( 
+	                  			array( '_id' => new \MongoId((string)$object_to_change) ),
+	                  			    array( '$set' => array( "status" => 'rejected') ) 
+	                  			);
+	                }
+	            }
+
+            }
+
+        }
+        // HTML
+        // 
+        // Tab QUESTION
+
+        $otherdata = [];
+        $html = '<div class="tab-content">';
+        
+
+        $cursor = $db->questionUpdateRequests->find(
+        	array('question_id' => array( '$ne' => 0), 'status' => array('$exists'=> false) ) );
+        $otherdata['question'] = $cursor->count();
+
+        $html .= '<div role="tabpanel" class="tab-pane active" id="question">';
+        $html .= "<h1>Questions <span class='badge'>".$cursor->count()."</span></h1><hr>";
+
 		while( $request = $cursor->getNext() )
 		{
-		    $html .=  "- ".$request['before'];
+		    
+			$html.= $this->app['libDiff']->htmlDiff($request['before'], $request['after']).'';
+
+			$html.='<a class="btn btn-link btn-sm" role="button" data-toggle="collapse" href="#collapseExample'.$request['_id'].'" aria-expanded="false" aria-controls="collapseExample"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a>';
+
+			$html.='<div class="collapse" id="collapseExample'.$request['_id'].'">';
+
+		    $html .=  "<div class='text-danger'>- ".$request['before']."</div>";
 		    
 		    if( isset( $request['before_category'] ) )
 		        $html .= ' / '.$g_config['categories'][ $request['before_category'] ];
-		    $html .= '<br/>';
 		    
-		    $html .=  "+ ".$request['after'];
+		    $html .=  "<div class='text-success'>+ ".$request['after']."</div>";
 
 		    if( isset( $request['after_category'] ) )
 		        $html .= ' / '.$g_config['categories'][ $request['after_category'] ];
-		    $html .= '<br/>';
-
-		    $html .= "<a href='/admin/moderationpanel?key=".$g_config['moderation_password']."&id=".$request['_id']."&accept=0'>Refuse</a> / ";
-		    $html .= "<a href='/admin/moderationpanel?key=".$g_config['moderation_password']."&id=".$request['_id']."&accept=1'>Accept</a>";
+			
+			$html .='</div>';
+ 			
+ 			$html .= '<br/>';
 		    
+		    $html .= "<a href='/admin/moderationpanel?key=".$g_config['moderation_password']."&id=".$request['_id']."&accept=0&type=question' class='btn btn-danger btn-xs'>Refuse</a> ";
+		    $html .= "<a href='/admin/moderationpanel?key=".$g_config['moderation_password']."&id=".$request['_id']."&accept=1&type=question' class='btn btn-success btn-xs'>Accept</a>";
+			
 		    $html .= "<br><br>";
-        }        
+        }
+
+        $html .= "</div>";  
+
+        // Tab ARGUMENT
+
+        $cursor = $db->questionUpdateRequests->find(array('question_id'=>0, 'status' => array('$exists'=> false) ));
+        $otherdata['argument'] = $cursor->count();
+
+        $html .= '<div role="tabpanel" class="tab-pane" id="argument">';
+        $html .= "<h1>Réponses <span class='badge'>".$cursor->count()."</span></h1><hr>";
+
+		while( $request = $cursor->getNext() )
+		{
+		    
+			$html.= $this->app['libDiff']->htmlDiff($request['before'], $request['after']).'';
+
+			$html.='<a class="btn btn-link btn-sm" role="button" data-toggle="collapse" href="#collapseExample'.$request['_id'].'" aria-expanded="false" aria-controls="collapseExample"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a>';
+			
+			$html.='<div class="collapse" id="collapseExample'.$request['_id'].'">';
+
+		    $html .=  "<div class='text-danger'>- ".$request['before']."</div>";
+		    
+		    if( isset( $request['before_category'] ) )
+		        $html .= ' / '.$g_config['categories'][ $request['before_category'] ];
+		    
+		    $html .=  "<div class='text-success'>+ ".$request['after']."</div>";
+
+		    if( isset( $request['after_category'] ) )
+		        $html .= ' / '.$g_config['categories'][ $request['after_category'] ];
+			
+			$html .='</div>';
+ 			
+ 			$html .= '<br/>';
+		    
+		    $html .= "<a href='/admin/moderationpanel?key=".$g_config['moderation_password']."&id=".$request['_id']."&accept=0&type=argument' class='btn btn-danger btn-xs'>Refuse</a> ";
+		    $html .= "<a href='/admin/moderationpanel?key=".$g_config['moderation_password']."&id=".$request['_id']."&accept=1&type=argument' class='btn btn-success btn-xs'>Accept</a>";
+			
+		    $html .= "<br><br>";
+        }
+
+        $html .= "</div>";    
+
+        // Tab Signalement
+
+        $cursor = $db->reports->group(
+		  array('type' => true, 'arg' => true, 'question' => true),
+		  array('count' => 0), 
+		  "function(doc, prev) { prev.count += 1 }",
+		  array('date' => array('$exists' => true))
+		);
+        $otherdata['report'] = count($cursor['retval']);
+
+        $html .= '<div role="tabpanel" class="tab-pane" id="report">';
+        $html .= "<h1>Signalement <span class='badge'>".count($cursor['retval'])."</span></h1><hr>";
+
+		foreach( $cursor['retval'] as $key=>$request )
+		{ 
+			if($request['type'] == "question") {
+				// Get this question	
+				$res = $db->questions->findOne( array( '_id' => new \MongoId( $request['question'] )) );  
+				$detail = $db->reports->find(array('question'=>$request['question']) );
+			} else {
+				// Get this answer	
+				$res = $db->args->findOne( array( '_id' => new \MongoId( $request['arg'] )) ); 
+				$detail = $db->reports->find(array('arg'=>$request['arg']) ); 
+			}
+
+		    $html .=  "<span class='label label-primary'>".$request['type']."</span> ".$res['text']." <span class='badge'>".$request['count']."</span>";
+
+			$html.='<a class="btn btn-link btn-sm" role="button" data-toggle="collapse" href="#collapseExample'.$key.'" aria-expanded="false" aria-controls="collapseExample"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span></a>';
+
+			$html.='<div class="collapse" id="collapseExample'.$key.'">';
+			
+			while( $det = $detail->getNext() )
+					{
+						$html .=  "<div class='text-danger'>".$this->getInfoReport($det['level'])."</div>";
+					}
+			
+			$html .='</div>';
+ 			
+ 			$html .= '<br/>';
+			
+		    $html .= "<br><br>";
+        }
+
+        $html .= "</div>";   
+
+        $html .= "</div>";     
         
-    
-        return $html;
+    	return $this->app['twig']->render('adminpanel.html.twig', array('body'=> $html, 'otherdata' => $otherdata));
+
     }
 
 }

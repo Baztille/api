@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Baztille Admin Panel</title>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />
+  <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+  <style type="text/css">
+    body.application{
+      background: white;
+      font-family: 'Gotham Rounded SSm A', 'Gotham Rounded SSm B', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      padding: 60px 20px 0;
+    }
+
+  </style>
+</head>
+<body class="application">
+
+  <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">Moderation</a>
+      </div>
+      <div class="navbar-collapse collapse">
+        <ul class="nav navbar-nav navbar-left" role="tablist">
+          <li class="active"><a href="#question" aria-controls="question" role="tab" data-toggle="tab">Questions <span class="badge">{{otherdata.question}}</span></a></li>
+          <li><a href="#argument" aria-controls="argument" role="tab" data-toggle="tab">Réponses <span class="badge">{{otherdata.argument}}</span></a></li>
+          <li><a href="#report" aria-controls="report" role="tab" data-toggle="tab">Signalement <span class="badge">{{otherdata.report}}</span></a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid">
+    
+    <div class="row">
+
+      <div class="col-sm-10">
+        {{ body|raw }}
+      </div>
+
+      <div class="col-sm-2">
+
+      </div>
+
+    </div>
+
+
+    <hr>
+
+    <p class="small text-muted">Admin panel - Baztille</p>
+
+  </div>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script type="text/javascript">
+  $('.navbar-nav li a').click(function (e) {
+    e.preventDefault()
+    $(this).tab('show');
+})
+</script>
+</body>
+</html>

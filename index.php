@@ -65,7 +65,6 @@ else if( isset( $_SERVER['argv'] ) )
 }
 
 
-
 // Require Silex
 $loader = require_once $g_config['silex_autoload_location'];
 
@@ -86,6 +85,9 @@ $loader->add('baztille', __DIR__ . '/services');
 // Loading controllers
 require_once __DIR__.'/controllers/controllers.php';
 require_once __DIR__.'/services/_loadservices.php';
+
+//Require external libs
+require_once __DIR__.'/lib/_loadlibs.php';
 
 $trace = $app['trace'];
 $is_job = isset( $_SERVER['argv'] );

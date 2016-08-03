@@ -56,9 +56,10 @@ $c_admin->get( '/moderationpanel', function( Request $request ) use ($app) {
         die(':(');
     
     $id = $request->get('id');
+    $type = $request->get('type');
     $bAccept = $request->get('accept')==1;
     
-    return $app['questionFlow']->getModerationPanel( $id, $bAccept );
+    return $app['questionFlow']->getModerationPanel( $id, $bAccept, $type );
 } );
 
 $c_admin->post( '/updatetopic', function( Request $request ) use ($app) {
