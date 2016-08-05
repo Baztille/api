@@ -1068,7 +1068,7 @@ class question
 		{
 		    // Get username
 		    $username = $db->users->findOne( array( '_id' => new \MongoId( $voter['user'] ) ), array( 'username' ) );
-		    if($username['username'] != "(remove)") {
+		    if($username['username'] != "(removed)") {
 		    	$result['voters'][] = array(
 		        	'id' => $voter['user'],
 		        	'name' => $username['username']
