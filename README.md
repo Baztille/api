@@ -9,16 +9,18 @@ Baztille est un mouvement de citoyens pour réinventer la démocratie.
 
 ## A propos de l'API Baztille
 
-(todo)
+Cet API fourni les données à l'application [cliente Baztille](https://github.com/Baztille/app)
+
+## Dépendances
+
+* PHP (+ Log-Pear)
+* MongoDB
+* Composer
 
 ## Installation
 
-(todo / dependencies)
-PHP
-MongoDB
-Composer
-Log - Pear
 ```
+# Si Log-Pear n'est pas installé
 $ apt-get install php-pear
 $ pear install Log
 ```
@@ -30,10 +32,10 @@ $ cd api
 $ composer install --prefer-source
 
 # Configurer l'URL de l'API
+# Modifier les valeurs du fichier config/config.init.php
 
 ```
 
-Pour plus d'infos sur ionic framework ? [Ionic Framework](http://ionicframework.com)
 
 ## Contribuer
 
