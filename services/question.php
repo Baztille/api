@@ -624,6 +624,27 @@ class question
 
     }
 
+    public function getMostUsedTopics( )
+    {
+
+        global $g_config;
+		$m = new \MongoClient(); // connect
+		$db = $m->selectDB( $g_config['db_name'] );
+
+		$topics = $db->questions->aggregate(
+			array( 
+		        array( '$project' => array('topics' =>1) ),
+		        array( '$unwind' => '$topics'),
+		        array( '$group' => array('_id' => '$topics', 'count' => array('$sum' => 1 ) ) ),
+		        array( '$sort' => array( 'count' => -1 )),
+		        array( '$limit' => 20)
+		    )
+		);
+
+        return $topics;
+
+    }
+
     public function saveSignalement( $question_id, $arg_id, $level )
     {
 

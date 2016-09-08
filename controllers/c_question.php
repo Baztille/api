@@ -126,10 +126,19 @@ $c_question->get( '/voters/{id}', function( $id, Request $request ) use ($app) {
 	$voters = $app['question']->getQuestionVoters( $id );
 	return $app->json( $app['wsrequest']->buildWsResponse( $voters ), 201, array('Access-Control-Allow-Origin' => '*','Access-Control-Allow-Headers'=>'Content-Type', 'Content-Type' => 'application/json') );
 } );
+
 $c_question->get( '/votersarg/{id}', function( $id, Request $request ) use ($app) {
 
 	$voters = $app['question']->getVoters( $id );
 	return $app->json( $app['wsrequest']->buildWsResponse( $voters ), 201, array('Access-Control-Allow-Origin' => '*','Access-Control-Allow-Headers'=>'Content-Type', 'Content-Type' => 'application/json') );
 } );
+
+$c_question->get( '/getmostusedtopics/list', function (Request $request) use($app) {
+
+    $total = $app['question']->getMostUsedTopics();
+    
+    return $app->json( $app['wsrequest']->buildWsResponse( $total ), 201, array('Access-Control-Allow-Origin' => '*','Access-Control-Allow-Headers'=>'Content-Type', 'Content-Type' => 'application/json') );
+} );
+
 
 return $c_question;
