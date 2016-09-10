@@ -55,7 +55,7 @@ class wsrequest
             $timestampCurrent = (isset($userdatas['current_session'])) ? $userdatas['current_session'] : 0 ;
             $timestamp = time();
 
-            if($timestamp - $timestampLast > (1 * 10 * 60 * 60)) { 
+            if($timestamp - $timestampCurrent > (1 * 10 * 60 * 60)) { 
                
                 $db->users->update( 
                     array( '_id' => new \MongoId( $user->id )),
